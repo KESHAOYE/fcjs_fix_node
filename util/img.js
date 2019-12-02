@@ -7,8 +7,8 @@ class img {
      * 判断是否是图片
      */
     isImg(string) {
-        console.log(string)
-        return string.test(/^data:image\/\w+;base64,/,);
+        let reg=new RegExp(/^data:image\/\w+;base64,/);
+        return reg.test(string);
     }
 
     /**
@@ -25,12 +25,16 @@ class img {
      * 查询是否重名
      * @param{*} filename 文件名
      */
-    checkexist(filename) {
-        const isexists = fs.exists(filename, function (el) {
-            return el
-        })
-        if (isexists) {
-            filename.test(/\(\d\)/);
+    checkexist(path,filename) {
+        if (fs.existsSync("./public/"+path+filename)) {
+            let reg=new RegExp(/\(\d\)/)
+            console.log("object");
+            if(reg.test(filename)){
+              let a=reg.match(filename)
+              console.log();
+            }
+        }else{
+            return filename+".png"
         }
     }
 
@@ -39,17 +43,19 @@ class img {
      */
     saveImg(path, string) {
         var time = new Date()
-        //if(this.isImg(string)) {
-        var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString()
+        if(this.isImg(string)) {
+        //var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString()
+        var filename=1
         fs.writeFile(path + filename, this.basetoimg(string), (err) => {
             if (err) {
                 return new Error(err)
             }
         })
+        this.checkexist(path,filename)
         return path + filename
-        // }else{
-        //     return new Error("您上传的不是一张图片")
-        // }
+         }else{
+             return new Error("您上传的不是一张图片")
+         }
     }
 }
 

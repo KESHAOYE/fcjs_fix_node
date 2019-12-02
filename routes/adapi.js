@@ -44,8 +44,7 @@ let schema=graphql.buildSchema(`
  * (命名规则)
  */
 const saveImg=(string)=>{
-  console.log(imgutil.saveImg("./public/ad/",string));
-   return imgutil.saveImg("ad/",string)
+   return imgutil.saveImg("./public/ad/",string)
 }
 var root={
     adinfos(){
