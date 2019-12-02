@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script>
+    function getdata() {
+      var query = `
+          query Account($username :String,$city :String){
+            account(username: $username){
+            name
+            age
+            department
+            salary(city:$city)
+        }
+      }`
+      var variables = {
+        username: 'likewei',
+        city: '北京'
+      }
+      fetch('http://localhost:3000/api', {
+          method: 'POST',
+          headers: {
+            "Content-Type": 'application/json',
+            "Accept": 'application/json',
+          },
+          body: JSON.stringify({
+            query: query,
+            variables: variables
+          })
+        })
+        .then((res) => {
+          return res.json()
+        })
+        .then((data) => {
+          console.log(data);
+        })
+    }
+  </script>
+</head>
+
+<body>
+  <button onclick="getdata()">获取</button>
+</body>
+
+</html>
