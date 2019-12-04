@@ -7,7 +7,7 @@ class img {
      * 判断是否是图片
      */
     isImg(string) {
-        let reg=new RegExp(/^data:image\/\w+;base64,/);
+        let reg = new RegExp(/^data:image\/\w+;base64,/);
         return reg.test(string);
     }
 
@@ -22,19 +22,20 @@ class img {
     }
 
     /**
-     * 查询是否重名
+     * 生成文件名 并 查询是否重名
      * @param{*} filename 文件名
      */
-    checkexist(path,filename) {
-        if (fs.existsSync("./public/"+path+filename)) {
-            let reg=new RegExp(/\(\d\)/)
-            console.log("object");
-            if(reg.test(filename)){
-              let a=reg.match(filename)
-              console.log();
+    checkexist(path) {
+        var time = new Date()
+        var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString() + time.getMilliseconds().toString() + (Math.ceil(Math.random() * 100)).toString()
+        if (fs.existsSync("./public/" + path + filename)) {
+            let reg = new RegExp(/\(\d\)/)
+            if (reg.test(filename)) {
+                let a = reg.match(filename)
+                return new Error("发生错误")
             }
-        }else{
-            return filename+".png"
+        } else {
+            return filename + ".png"
         }
     }
 
@@ -42,20 +43,17 @@ class img {
      * 将广告图片保存到路径中
      */
     saveImg(path, string) {
-        var time = new Date()
-        if(this.isImg(string)) {
-        //var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString()
-        var filename=1
-        fs.writeFile(path + filename, this.basetoimg(string), (err) => {
-            if (err) {
-                return new Error(err)
-            }
-        })
-        this.checkexist(path,filename)
-        return path + filename
-         }else{
-             return new Error("您上传的不是一张图片")
-         }
+        let el = this.checkexist(path)
+        if (this.isImg(string)) {
+            fs.writeFile(path + el, this.basetoimg(string), (err) => {
+                if (err) {
+                    return new Error(err)
+                }
+            })
+            return path + el
+        } else {
+            return new Error("您上传的不是图片")
+        }
     }
 }
 

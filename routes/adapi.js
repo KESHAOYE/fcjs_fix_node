@@ -1,12 +1,12 @@
-const express=require("express");
-const graphql=require('graphql');
-const egraph=require('express-graphql')
-const mysql=require('../util/db')
-const img=require('../util/img')
-const router=express();
-const imgutil=new img();
+const express = require("express");
+const graphql = require('graphql');
+const egraph = require('express-graphql')
+const mysql = require('../util/db')
+const img = require('../util/img')
+const router = express();
+const imgutil = new img();
 
-let schema=graphql.buildSchema(`
+let schema = graphql.buildSchema(`
   type adInfo{
     id: ID!,
     adid:Int,
@@ -31,10 +31,11 @@ let schema=graphql.buildSchema(`
     create_man:String
   },
   type Query{
-      adinfos:[adInfo]
+      adinfos(id:ID!):[adInfo]
   }
   type Mutation{
       insertAd(input:adinfo):adInfo
+      updateAD(id:ID!,input:adinfo):adInfo
   }
 `)
 /**
@@ -43,53 +44,64 @@ let schema=graphql.buildSchema(`
  * return 存储路径 localhost:3000/ad/..
  * (命名规则)
  */
-const saveImg=(string)=>{
-   return imgutil.saveImg("./public/ad/",string)
+const saveImg = (string) => {
+  return imgutil.saveImg("./public/ad/", string)
 }
-var root={
-    adinfos(){
-      return new Promise((resolve,reject)=>{
-       mysql.query("select * from adinfo",(err,data)=>{
-          if(err){
-            reject(err)
-          }
-          resolve(data)
-       })
+var root = {
+  adinfos({id}) {
+    return new Promise((resolve, reject) => {
+      mysql.query("select * from adinfo where id= ?", id ,(err, data) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(data)
       })
-    },
-    insertAd({input}){
-        const data={
-            id:"1",
-            adid:input.adid,
-            adimg:saveImg(input.adimg),
-            create_time:new Date(),
-            startdue:new Date(input.startdue),
-            overdue:new Date(input.overdue),
-            priority:input.priority,
-            shopid:input.shopid,
-            clickcount:0,
-            create_man:input.create_man,
-        }  
-        return new Promise((resolve,reject)=>{
-        mysql.query("insert into adinfo set ?",data,(err,data)=>{
-            if(err){
-              console.log("发生错误"+err.message)
-              reject(err)
-            }
-            resolve(data)
-            return JSON.stringify({
-                code:"200",
-                message:"success"
-            })
-        })
-      })
+    })
+  },
+  insertAd({
+    input
+  }) {
+    const data = {
+      adid: input.adid,
+      adimg: saveImg(input.adimg),
+      create_time: new Date(),
+      startdue: new Date(input.startdue),
+      overdue: new Date(input.overdue),
+      priority: input.priority,
+      shopid: input.shopid,
+      clickcount: 0,
+      create_man: input.create_man,
     }
+    mysql.query("insert into adinfo set ?", data, (err, data) => {
+      if (err) {
+        console.log("发生错误" + err.message)
+        return JSON.stringify({
+          code: "410",
+          message: "失败"+err.message
+        })
+      }
+      return JSON.stringify({
+        code: "200",
+        message: "success"
+      })
+    })
+  },
+  updateAd({
+    id,
+    adid,
+    adimg,
+    startdue,
+    overdue,
+    clickcount,
+    create_man
+  }){
+     
+  }
 }
-
-router.use("/",egraph({
-    schema:schema,
-    rootValue:root,
-    graphiql:true
+router.use("/", egraph({
+  schema: schema,
+  rootValue: root,
+  graphiql: true
 }))
 
-module.exports=router;
+module.exports = router;
