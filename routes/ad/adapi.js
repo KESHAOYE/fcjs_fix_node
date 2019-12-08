@@ -1,17 +1,20 @@
 const express = require("express");
 const graphql = require('graphql');
 const egraph = require('express-graphql')
-const mysql = require('../util/db')
-const img = require('../util/img')
-const router = express();
+const mysql = require('../../util/db')
+const img = require('../../util/img')
+const router = express.Router();
 const imgutil = new img();
 
+/**
+ * 广告接口
+ */
 let schema = graphql.buildSchema(`
   type adInfo{
     id: ID!,
     adid:Int,
     adimg:String,
-    create_time:String,
+    createTime:String,
     startdue:String,
     overdue:String,
     priority:Int,
@@ -22,7 +25,7 @@ let schema = graphql.buildSchema(`
   input adinfo{
     adid:Int,
     adimg:String,
-    create_time:String,
+    createTime:String,
     startdue:String,
     overdue:String,
     priority:Int,
@@ -31,11 +34,12 @@ let schema = graphql.buildSchema(`
     create_man:String
   },
   type Query{
-      adinfos(id:ID!):[adInfo]
+      adinfos:[adInfo]
   }
   type Mutation{
       insertAd(input:adinfo):adInfo
-      updateAD(id:ID!,input:adinfo):adInfo
+      updateAD(id:ID!,adid:Int,adimg:String,startdue:String,overdue:String,priority:Int,create_man:String):adInfo
+      updateCount(id:ID!,clickcount:Int):adInfo
   }
 `)
 /**
@@ -48,9 +52,12 @@ const saveImg = (string) => {
   return imgutil.saveImg("./public/ad/", string)
 }
 var root = {
-  adinfos({id}) {
+  /**
+   * 获取所有广告
+   */
+  adinfos() {
     return new Promise((resolve, reject) => {
-      mysql.query("select * from adinfo where id= ?", id ,(err, data) => {
+      mysql.query("select * from adinfo", (err, data) => {
         if (err) {
           reject(err)
         }
@@ -58,6 +65,10 @@ var root = {
       })
     })
   },
+  /**
+   * 添加广告
+   * @param {*} param0 
+   */
   insertAd({
     input
   }) {
@@ -86,22 +97,69 @@ var root = {
       })
     })
   },
+  /**
+   * 更新广告
+   * @param {*} param0 
+   */
   updateAd({
     id,
     adid,
     adimg,
     startdue,
     overdue,
-    clickcount,
+    priority,
     create_man
   }){
-     
+    const data = [
+      adid,
+      saveImg(adimg),
+      new Date(startdue),
+      new Date(overdue),
+      priority,
+      create_man,
+      id
+    ]
+    mysql.query("update adinfo set adid= ?,adimg=?,startdue=?,overdue=?,priority=?,create_man=? where id=?",data,(err,data)=>{
+      if( err ){
+        console.log("发生错误" + err.message)
+        return JSON.stringify({
+          code: "410",
+          message: "失败"+err.message
+        })
+      }
+      return JSON.stringify({
+        code: "200",
+        message: "success"
+      })
+    })
+  },
+  /**
+   * 添加点击次数
+   * @param {*} param0 
+   */
+  updateCount({
+    id,
+    clickcount
+  }){
+    const data=[++clickcount,id]
+    mysql.query("update adinfo set clickcount=? where id=?",data,(err)=>{
+      if( err ){
+        console.log("发生错误" + err.message)
+        return JSON.stringify({
+          code: "410",
+          message: "失败"+err.message
+        })
+      }
+      return JSON.stringify({
+        code: "200",
+        message: "success"
+      })
+    })
   }
 }
-router.use("/", egraph({
+router.post("/", egraph({
   schema: schema,
   rootValue: root,
-  graphiql: true
 }))
 
 module.exports = router;

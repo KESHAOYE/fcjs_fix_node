@@ -5,9 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var adapiRouter=require("./routes/adapi");
-var mutation=require("./routes/mutation")
+var brandRouter = require('./routes/home/brand');
+var adapiRouter=require("./routes/ad/adapi");
 
 var app = express();
 
@@ -22,9 +21,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/adapi',adapiRouter);
-app.use('/mutation',mutation)
+app.use('/brand',brandRouter);
 // catch 404 and forward to error handler
 //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {
