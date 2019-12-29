@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
 var adapiRouter = require("./routes/ad/adapi");
 var fixmodelRouter = require('./routes/home/fixmodel') 
+var sortRouter = require('./routes/home/sort')
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use('/', indexRouter);
 app.use('/adapi',adapiRouter);
 app.use('/brand',brandRouter);
 app.use('/fixmodel',fixmodelRouter)
+app.use('/sort',sortRouter)
 // catch 404 and forward to error handler
 //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

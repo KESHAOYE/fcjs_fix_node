@@ -7,7 +7,7 @@ const router = express.Router();
 const imgutil = new img();
 
 /**
- * 广告接口
+ * 广告接口 
  */
 let schema = graphql.buildSchema(`
   type adInfo{
@@ -34,7 +34,7 @@ let schema = graphql.buildSchema(`
     create_man:String
   },
   type Query{
-      adinfos:[adInfo]
+      adinfos(adid: Int!):[adInfo]
   }
   type Mutation{
       insertAd(input:adinfo):adInfo
@@ -53,11 +53,14 @@ const saveImg = (string) => {
 }
 var root = {
   /**
-   * 获取所有广告
+   * 通过广告位获取广告
    */
-  adinfos() {
+  adinfos({input}) {
     return new Promise((resolve, reject) => {
-      mysql.query("select * from adinfo", (err, data) => {
+      const data = {
+        adid: input
+      }
+      mysql.query("select * from adinfo where ?", data, (err, data) => {
         if (err) {
           reject(err)
         }

@@ -13,7 +13,7 @@ var schema = graphql.buildSchema(`
       isdelete: Int
   }
   type Query{
-      fismodel(brandid: ID!):[fixmodel]
+      fixmodel(brandid: ID!):[fixmodel]
   }
   input inputfixmodel{
     brandid: ID!,
