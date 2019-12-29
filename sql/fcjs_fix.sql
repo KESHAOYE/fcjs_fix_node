@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 08/12/2019 22:15:39
+ Date: 29/12/2019 11:13:08
 */
 
 SET NAMES utf8mb4;
@@ -45,7 +45,7 @@ CREATE TABLE `adinfo` (
   `adid` int(11) NOT NULL COMMENT '对应广告位',
   `adimg` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '广告图',
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-对应商品id',
-  `create_time` datetime(6) NOT NULL COMMENT '创建时间',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
   `overdue` datetime(6) NOT NULL COMMENT '过期时间',
   `create_man` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-对应员工号，添加人',
   `clickcount` int(11) NOT NULL DEFAULT '0' COMMENT '点击次数',
@@ -115,18 +115,19 @@ CREATE TABLE `comment_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='评论商品表';
 
 -- ----------------------------
--- Table structure for couponinfo
+-- Table structure for fixmodel
 -- ----------------------------
-DROP TABLE IF EXISTS `couponinfo`;
-CREATE TABLE `couponinfo` (
-  `recommentid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '优惠券id',
-  `shopid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-绑定的shopid',
-  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
-  `startdue` datetime(6) NOT NULL COMMENT '开始日期',
-  `overdue` datetime(6) NOT NULL COMMENT '结束日期',
-  `createMan` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-员工id',
-  PRIMARY KEY (`recommentid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='发现好货（官方推荐）';
+DROP TABLE IF EXISTS `fixmodel`;
+CREATE TABLE `fixmodel` (
+  `brandid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-品牌id',
+  `modelid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '机型id',
+  `modelname` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '机型名称',
+  `modelename` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '机型英文名称',
+  `isdelete` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '删除标记',
+  PRIMARY KEY (`modelid`),
+  KEY `fbrandid` (`brandid`),
+  CONSTRAINT `fbrandid` FOREIGN KEY (`brandid`) REFERENCES `brandinfo` (`brandid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='维修机型';
 
 -- ----------------------------
 -- Table structure for orderinfo
@@ -184,6 +185,20 @@ CREATE TABLE `paymlist` (
   `paymdes` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '支付公司介绍',
   PRIMARY KEY (`paym_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='支付方式信息\n';
+
+-- ----------------------------
+-- Table structure for recommend
+-- ----------------------------
+DROP TABLE IF EXISTS `recommend`;
+CREATE TABLE `recommend` (
+  `recommentid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '优惠券id',
+  `shopid` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-绑定的shopid',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  `startdue` datetime(6) NOT NULL COMMENT '开始日期',
+  `overdue` datetime(6) NOT NULL COMMENT '结束日期',
+  `createMan` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-员工id',
+  PRIMARY KEY (`recommentid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='发现好货（官方推荐）';
 
 -- ----------------------------
 -- Table structure for searchrecord

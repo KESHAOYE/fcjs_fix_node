@@ -7,7 +7,7 @@ const router = express();
 var schema=graphql.buildSchema(
     `
      type coupon{
-         
+        
      }
      type Query{
         

@@ -6,7 +6,8 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
-var adapiRouter=require("./routes/ad/adapi");
+var adapiRouter = require("./routes/ad/adapi");
+var fixmodelRouter = require('./routes/home/fixmodel') 
 
 var app = express();
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/adapi',adapiRouter);
 app.use('/brand',brandRouter);
+app.use('/fixmodel',fixmodelRouter)
 // catch 404 and forward to error handler
 //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {
