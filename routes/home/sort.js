@@ -23,8 +23,8 @@ var schema = graphql.buildSchema(`
    isshow: Int
  }
 type Mutation{
-   insertSort(input: inputsort)
-   updateSort(sortid: ID!,input: inputsort)
+   insertSort(input: inputsort) :sort
+   updateSort(id:ID!,input: inputsort) :sort
 }
 `)
 
@@ -57,15 +57,15 @@ var root = {
       })
     })
   },
-  updateSort({input}){
+  updateSort(id,{input}){
     const data = {
       sortname: input.sortname,
       sortename: input.sortename,
-      createTime: new Date(),
+      createTime: input.createTime,
       isshow: input.isshow
     }
     return new Promise((resolve,reject)=>{
-      mysql.query('update sortInfo set ? where ?',[data,input.sortid],(err,data)=>{
+      mysql.query('update sortInfo set ? where ?',[data,id],(err,data)=>{
           if(err){
              reject(new Error(err))
           }else{
