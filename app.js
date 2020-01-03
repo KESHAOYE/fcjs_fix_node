@@ -3,7 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const http = require('http')
+const socketIo = require('socket.io')
+const chat = require('./util/chat')
 
+chat();
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
 var adapiRouter = require("./routes/ad/adapi");
@@ -43,5 +47,4 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
 module.exports = app;
