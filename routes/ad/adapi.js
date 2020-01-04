@@ -1,6 +1,4 @@
 const express = require("express");
-const graphql = require('graphql');
-const egraph = require('express-graphql')
 const mysql = require('../../util/db')
 const img = require('../../util/img')
 const router = express.Router();
@@ -34,7 +32,7 @@ let schema = graphql.buildSchema(`
     create_man:String
   },
   type Query{
-      adinfos(adid: Int!):[adInfo]
+      adinfos(adid: Int):[adInfo]
   }
   type Mutation{
       insertAd(input:adinfo):adInfo
@@ -51,12 +49,14 @@ let schema = graphql.buildSchema(`
 const saveImg = (string) => {
   return imgutil.saveImg("./public/ad/", string)
 }
+
 var root = {
   /**
    * 通过广告位获取广告
    */
   adinfos({input}) {
     return new Promise((resolve, reject) => {
+      console.log(input)
       const data = {
         adid: input
       }
@@ -160,9 +160,8 @@ var root = {
     })
   }
 }
-router.post("/", egraph({
-  schema: schema,
-  rootValue: root,
-}))
+router.post("/", (req, res, next) => {
+   
+})
 
 module.exports = router;

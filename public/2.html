@@ -3,7 +3,7 @@
     var soc = io('http://localhost:200');
   window.onload = function () {
   //向指定的服务器建立连接，地址可以省略
-  var customId = prompt("请输入您的名字")
+  var customId = prompt('输入名字')
   soc.on('connect',()=>{
     console.log('连接成功');
     console.log('用户名'+customId);
@@ -26,10 +26,6 @@
       }
     });
   })
-  soc.on('msg',(data)=>{
-   //监听浏览器通过msg事件发送的信息
-      console.log(`服务器:${data}`);//你好浏览器
-  })
   /**
    * 当有新用户连接时 
    */
@@ -37,7 +33,7 @@
       console.log(data)
   })
   soc.on('sayto', (data)=>{
-      console.log(`${data.user}向您发送了:${data.msg}`);
+      console.log(`${data.user}向您发送了:${data.msg}`)
   })
 }
   function send() {

@@ -15,17 +15,21 @@ function chat() {
         //监听connection（用户连接）事件，socket为用户连接的实例
         //监听用户名
         socket.on('storeClientInfo', (data) => {
-            var clientInfo = new Object();
+            var clientInfo = new Object()
             clientInfo.customId = data.customId;
             clientInfo.clientId = socket.id;
             clients.push(clientInfo);
             soc.emit('storeClientInfo', clients)
-            socket.emit('newconnect', clients)
             console.log("用户" + clientInfo.customId + "连接");
+            soc.emit('newconnect', clients)
         })
         //监听用户断开事件
         socket.on('disconnect', () => {
-            console.log("用户断开连接");
+            let user = clients.findIndex(function(el){
+                return el.clientId === socket.id
+            })
+            clients.splice(user, 1)
+            console.log("用户断开连接" + socket.id);
         });
         socket.on('sayto', (data) => {
             var toId = data.id;
