@@ -6,11 +6,13 @@ var logger = require('morgan');
 const http = require('http')
 const socketIo = require('socket.io')
 const chat = require('./util/chat')
+const token = require('./util/token')
 
+new token().newToken('15359639480', 'LKW54321likewei.');
 chat();
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
-var adapiRouter = require("./routes/ad/adapi");
+// var adapiRouter = require("./routes/ad/adapi");
 var fixmodelRouter = require('./routes/home/fixmodel') 
 var sortRouter = require('./routes/home/sort')
 
@@ -27,7 +29,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/adapi',adapiRouter);
+// app.use('/adapi',adapiRouter);
 app.use('/brand',brandRouter);
 app.use('/fixmodel',fixmodelRouter)
 app.use('/sort',sortRouter)
