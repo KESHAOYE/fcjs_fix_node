@@ -40,7 +40,7 @@ class img {
     }
 
     /**
-     * 将广告图片保存到路径中
+     * 将图片保存到路径中
      */
     saveImg(path, string) {
         let el = this.checkexist(path)

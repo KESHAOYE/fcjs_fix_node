@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "cnpm i &&node ./bin/www",
+    "devstart": "cnpm i && nodemon .bin/www",
     "keshaoye": "cnpm i && nodemon .bin/www"
   },
   "dependencies": {

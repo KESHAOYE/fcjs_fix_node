@@ -4,10 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const http = require('http')
+//引入socket服务
 const chat = require('./util/chat')
+//引入 token服务
 const token = require('./util/token')
+//引入图片验证码库
+const validator = require('./util/imgvalidator')
 
-new token().newToken('15359639480', 'LKW54321likewei.');
+new validator(200,150).createMainImg ()
 chat();
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
