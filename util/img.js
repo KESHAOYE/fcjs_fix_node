@@ -1,5 +1,6 @@
 const fs = require('fs')
 const express = require('express')
+const type = require('mime-types')
 const app = express()
 
 class img {
@@ -20,12 +21,18 @@ class img {
         var dataBuffer = new Buffer(base64Data, 'base64');
         return dataBuffer
     }
-
-    /**
-     * 生成文件名 并 查询是否重名
-     * @param{*} filename 文件名
-     */
-    checkexist(path) {
+    imgtobase(path) {
+            let bitmap = fs.readFileSync(path)
+            let base64str = Buffer.from(bitmap, 'binary').toString('base64'); // base64编码
+            base64str = "data:" + type.lookup(path) + ";base64," + base64str
+            return base64str;
+        }
+        /**
+         * 生成文件名 并 查询是否重名
+         * @param{*} filename 文件名
+         */
+    checkexist(path, type) {
+        type = type == '' ? '.png' : type
         var time = new Date()
         var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString() + time.getMilliseconds().toString() + (Math.ceil(Math.random() * 100)).toString()
         if (fs.existsSync("./public/" + path + filename)) {
@@ -35,7 +42,7 @@ class img {
                 return new Error("发生错误")
             }
         } else {
-            return filename + ".png"
+            return filename + type
         }
     }
 
