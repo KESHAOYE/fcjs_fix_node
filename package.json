@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "cnpm i &&node ./bin/www",
-    "devstart": "cnpm i && nodemon .bin/www"
+    "keshaoye": "cnpm i && nodemon .bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -12,10 +12,14 @@
     "ejs": "~2.6.1",
     "express": "~4.16.1",
     "express-graphql": "^0.9.0",
+    "gm": "^1.23.1",
     "graphql": "^14.5.8",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "mysql": "^2.17.1"
+    "mysql": "^2.17.1",
+    "node-rsa": "^1.0.7",
+    "socket.io": "^2.3.0",
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"

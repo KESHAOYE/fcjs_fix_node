@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const http = require('http')
-const socketIo = require('socket.io')
 const chat = require('./util/chat')
 const token = require('./util/token')
 
