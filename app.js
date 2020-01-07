@@ -11,9 +11,9 @@ const token = require('./util/token')
     //引入图片验证码库
 const validator = require('./util/imgvalidator')
 
-console.log("%c ****开发环境下要调用图片验证码接口系统需为Windows 且安装GraphicsMagick 如报错可重启电脑再试****","color:red;font-size:20px");
-console.log(' ****Redis环境目前仅配置Windows ,端口为3005****');
-chat();
+// new validator(250,150).getData('15359639480')
+// new validator(250,150).checkData('15359639480')
+// chat();
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
 // var adapiRouter = require("./routes/ad/adapi");

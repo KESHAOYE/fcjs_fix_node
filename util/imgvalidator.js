@@ -2,8 +2,12 @@
 const images = require('gm');
 //导入文件操作哭
 const fs = require('fs');
+// 导入图片操作库
 const img = require('./img')
 const imgutil = new img()
+// 导入Redis库
+const client = require('./redis')
+const redis = require('redis')
 
 class imgValidator {
     /**
@@ -53,7 +57,7 @@ class imgValidator {
                     .write('./public/validator/' + filename, function(err) {
                         if (!err) {
                             resolve(imgutil.imgtobase('./public/validator/' + filename))
-                            // fs.unlinkSync('./public/validator/' + filename)
+                            fs.unlinkSync('./public/validator/' + filename)
                         } else {
                             reject(err)
                         }
@@ -72,25 +76,65 @@ class imgValidator {
                 .write('./public/validator/' + filename, function(err) {
                     if (!err) {
                         resolve(imgutil.imgtobase('./public/validator/' + filename))
-                        // fs.unlinkSync('./public/validator/' + filename)
+                        fs.unlinkSync('./public/validator/' + filename)
                     } else {
                         reject(err)
                     }
                 })
         })
     }
-    async getData() {
+    async getData(phone) {
         this.randomXY()
         this.readImg()
         let bg = await this.createMainImg()
         let patch = await this.createPairImg()
+        let time = Math.round(new Date().getTime()/1000) + 60 * 3
+        // 存入redis
+        client.hmset(`V${phone}`,{
+            x: this.x,
+            time: time
+        },redis.print)
         return {
             bg: bg,
             patch: patch,
-            x: this.x,
             y: this.y
         }
     }
+    async checkData(phone,data){
+      let time = 0
+      let x = 0
+      // 异步获取时间
+      await new Promise(function(resolve,reject){
+          client.hget(`V${phone}`,'time',function(err,value){
+            if(!err){
+             resolve(value)
+            } else {
+             reject(err)
+            }
+      })
+    }).then(data => {time = data})
+    // 异步获取坐标
+    await new Promise(function(resolve,reject){
+        client.hget(phone,'x',function(err,value){
+          if(!err){
+           resolve(value)
+          } else {
+           reject(err)
+          }
+    })
+  }).then(data => {x = data})
+   if(Math.round(time - new Date().getTime()/1000) >= 0) {
+     // 时间通过 验证 X
+     if( data > x - 15 || data< x + 15  ){
+         // x 通过
+         return Promise.resolve('ok')
+     } else {
+         return Promise.reject('验证出错')
+     }
+   } else {
+       return Promise.reject('验证超时')
+   }
+  }
 }
 
 module.exports = imgValidator
