@@ -14,8 +14,9 @@ class imgValidator {
     constructor(width, height) {
             this.width = width
             this.height = height
-            this.valwidth = this.width / 5
+            this.valwidth = this.width / 6
             this.valheight = this.valwidth
+            this.validatorImg = ''
             this.x = 0
             this.y = 0
         }
@@ -27,10 +28,17 @@ class imgValidator {
             this.y = Math.floor(Math.random() * (this.height - this.valheight) + 1)
         }
         /**
+         * 随机读取图片
+         */
+    readImg() {
+        let random = Math.floor(Math.random()*4 + 1)
+        this.validatorImg = `./public/validator/${random}.jpg`
+    }
+        /**
          * 修改图片大小为请求的大小
          */
     zipImg() {
-            return images('./public/ad/1.jpg').resize(this.width, this.height, '!')
+            return images(this.validatorImg).resize(this.width, this.height, '!')
         }
         /**
          * 生成主图
@@ -39,14 +47,13 @@ class imgValidator {
             let that = this
             let filename = imgutil.checkexist('validator', '.jpg')
             return new Promise(function(resolve, reject) {
-                console.log(that.x + that.valwidth)
                 that.zipImg()
                     .fill('#fff')
                     .drawRectangle(that.x, that.y, that.x + that.valwidth, that.y + that.valheight)
-                    .write(filename, function(err) {
+                    .write('./public/validator/' + filename, function(err) {
                         if (!err) {
-                            resolve(imgutil.imgtobase(filename))
-                            fs.unlinkSync(filename)
+                            resolve(imgutil.imgtobase('./public/validator/' + filename))
+                            // fs.unlinkSync('./public/validator/' + filename)
                         } else {
                             reject(err)
                         }
@@ -62,10 +69,10 @@ class imgValidator {
         return new Promise(function(resolve, reject) {
             that.zipImg()
                 .crop(that.valwidth, that.valheight, that.x, that.y)
-                .write(filename, function(err) {
+                .write('./public/validator/' + filename, function(err) {
                     if (!err) {
-                        resolve(imgutil.imgtobase(filename))
-                        fs.unlinkSync(filename)
+                        resolve(imgutil.imgtobase('./public/validator/' + filename))
+                        // fs.unlinkSync('./public/validator/' + filename)
                     } else {
                         reject(err)
                     }
@@ -74,6 +81,7 @@ class imgValidator {
     }
     async getData() {
         this.randomXY()
+        this.readImg()
         let bg = await this.createMainImg()
         let patch = await this.createPairImg()
         return {
