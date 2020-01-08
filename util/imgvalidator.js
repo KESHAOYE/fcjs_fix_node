@@ -94,6 +94,7 @@ class imgValidator {
             x: this.x,
             time: time
         },redis.print)
+        console.log(this.x)
         return {
             bg: bg,
             patch: patch,
@@ -123,19 +124,22 @@ class imgValidator {
            reject(err)
           }
     })
-  }).then(data => {x = data})
+  }).then(data => {
+      x = data
+  })
+  await new Promise(function(resolve,reject){
    if(Math.round(time - new Date().getTime()/1000) >= 0) {
      // 时间通过 验证 X
      if( data > x - 15 || data< x + 15  ){
          // x 通过
-         return Promise.resolve('ok')
+         resolve('ok')
      } else {
-         return Promise.reject('验证出错')
+         rreject('验证出错')
      }
    } else {
        return Promise.reject('验证超时')
    }
-  }
+  })
 }
 
 module.exports = imgValidator
