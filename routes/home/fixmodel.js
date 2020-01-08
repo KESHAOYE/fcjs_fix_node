@@ -79,7 +79,7 @@ var root = {
       })
     }
 }
-router.use('/',egraph({
+router.post('/',egraph({
     schema:schema,
     rootValue:root,
     graphiql:true

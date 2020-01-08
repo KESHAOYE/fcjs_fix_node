@@ -28,8 +28,8 @@ class imgValidator {
          * 生成随机整数坐标
          */
     randomXY() {
-            this.x = Math.floor(Math.random() * (this.width - this.valwidth) + 1)
-            this.y = Math.floor(Math.random() * (this.height - this.valheight) + 1)
+            this.x = Math.floor(Math.random() * ((this.width - this.valwidth) - this.valwidth) +  this.valwidth)
+            this.y = Math.floor(Math.random() * (this.height - this.valheight) + this.height)
         }
         /**
          * 随机读取图片
@@ -52,7 +52,7 @@ class imgValidator {
             let filename = imgutil.checkexist('validator', '.jpg')
             return new Promise(function(resolve, reject) {
                 that.zipImg()
-                    .fill('#fff')
+                    .fill('#f2f2f2')
                     .drawRectangle(that.x, that.y, that.x + that.valwidth, that.y + that.valheight)
                     .write('./public/validator/' + filename, function(err) {
                         if (!err) {
@@ -97,7 +97,8 @@ class imgValidator {
         return {
             bg: bg,
             patch: patch,
-            y: this.y
+            y: this.y,
+            valwidth: this.valwidth
         }
     }
     async checkData(phone,data){
