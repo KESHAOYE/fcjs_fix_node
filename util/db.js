@@ -2,14 +2,29 @@
  * 用于连接数据库
  */
 
- const mysql=require("mysql")
+const mysql = require("mysql")
 
- var pool = mysql.createPool({
+var pool = mysql.createPool({
     host: "localhost",
     port: "3306",
     user: "root",
     password: "LKW54321likewei.",
     database: "fcjs_fix"
- })
+})
 
- module.exports=pool
+var query = function(sql, callback) {
+    pool.getConnection(function(err, conn) {
+        if (err) {
+            callback(err, null, null);
+        } else {
+            conn.query(sql, function(qerr, vals, fields) {
+                //释放连接
+                conn.release();
+                //事件驱动回调
+                callback(qerr, vals, fields);
+            });
+        }
+    });
+};
+
+module.exports = query

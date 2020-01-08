@@ -38,6 +38,8 @@ app.use('/fixmodel', fixmodelRouter)
 app.use('/sort', sortRouter)
 let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
+let login = require('./routes/user/login')
+app.use('/login', login)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

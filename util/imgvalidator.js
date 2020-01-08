@@ -5,7 +5,7 @@ const fs = require('fs');
 // 导入图片操作库
 const img = require('./img')
 const imgutil = new img()
-// 导入Redis库
+    // 导入Redis库
 const client = require('./redis')
 const redis = require('redis')
 
@@ -28,16 +28,16 @@ class imgValidator {
          * 生成随机整数坐标
          */
     randomXY() {
-            this.x = Math.floor(Math.random() * ((this.width - this.valwidth) - this.valwidth) +  this.valwidth)
+            this.x = Math.floor(Math.random() * ((this.width - this.valwidth) - this.valwidth) + this.valwidth)
             this.y = Math.floor(Math.random() * (this.height - this.valheight) + this.height)
         }
         /**
          * 随机读取图片
          */
     readImg() {
-        let random = Math.floor(Math.random()*4 + 1)
-        this.validatorImg = `./public/validator/${random}.jpg`
-    }
+            let random = Math.floor(Math.random() * 4 + 1)
+            this.validatorImg = `./public/validator/${random}.jpg`
+        }
         /**
          * 修改图片大小为请求的大小
          */
@@ -88,12 +88,12 @@ class imgValidator {
         this.readImg()
         let bg = await this.createMainImg()
         let patch = await this.createPairImg()
-        let time = Math.round(new Date().getTime()/1000) + 60 * 3
-        // 存入redis
-        client.hmset(`V${phone}`,{
+        let time = Math.round(new Date().getTime() / 1000) + 60 * 3
+            // 存入redis
+        client.hmset(`V${phone}`, {
             x: this.x,
             time: time
-        },redis.print)
+        })
         console.log(this.x)
         return {
             bg: bg,
@@ -102,44 +102,52 @@ class imgValidator {
             valwidth: this.valwidth
         }
     }
-    async checkData(phone,data){
-      let time = 0
-      let x = 0
-      // 异步获取时间
-      await new Promise(function(resolve,reject){
-          client.hget(`V${phone}`,'time',function(err,value){
-            if(!err){
-             resolve(value)
+    async checkData(phone, data) {
+        let time = 0
+        let x = 0
+            // 异步获取时间
+        await new Promise(function(resolve, reject) {
+                client.hget(`V${phone}`, 'time', function(err, value) {
+                    if (!err) {
+                        resolve(value)
+                    } else {
+                        reject(err)
+                    }
+                })
+            }).then(data => { time = data })
+            // 异步获取坐标
+        await new Promise(function(resolve, reject) {
+            client.hget(`V${phone}`, 'x', function(err, value) {
+                if (!err) {
+                    resolve(value)
+                } else {
+                    reject(err)
+                }
+            })
+        }).then(data => {
+            x = data
+        })
+        return new Promise(function(resolve, reject) {
+            if (Math.round(time - new Date().getTime() / 1000) >= 0) {
+                // 时间通过 验证 X
+                console.log(data, x, time)
+                x = parseInt(x)
+                console.log(x - 15, x + 15)
+                console.log(data > x - 15 || data < x + 15)
+                if (data > x - 15 && data < x + 15) {
+                    // x 通过
+                    resolve('ok')
+                    console.log('ok');
+                } else {
+                    reject('验证出错')
+                    console.log('验证出错');
+                }
             } else {
-             reject(err)
+                reject('验证超时')
+                console.log('验证超时');
             }
-      })
-    }).then(data => {time = data})
-    // 异步获取坐标
-    await new Promise(function(resolve,reject){
-        client.hget(phone,'x',function(err,value){
-          if(!err){
-           resolve(value)
-          } else {
-           reject(err)
-          }
-    })
-  }).then(data => {
-      x = data
-  })
-  await new Promise(function(resolve,reject){
-   if(Math.round(time - new Date().getTime()/1000) >= 0) {
-     // 时间通过 验证 X
-     if( data > x - 15 || data< x + 15  ){
-         // x 通过
-         resolve('ok')
-     } else {
-         rreject('验证出错')
-     }
-   } else {
-       return Promise.reject('验证超时')
-   }
-  })
+        })
+    }
 }
 
 module.exports = imgValidator
