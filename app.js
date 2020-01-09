@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+ 
 const http = require('http')
     //引入socket服务
 const chat = require('./util/chat')
@@ -21,6 +22,11 @@ var fixmodelRouter = require('./routes/home/fixmodel')
 var sortRouter = require('./routes/home/sort')
 
 var app = express();
+
+var bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -36,10 +42,10 @@ app.use('/', indexRouter);
 app.use('/brand', brandRouter);
 app.use('/fixmodel', fixmodelRouter)
 app.use('/sort', sortRouter)
+let login = require('./routes/user/login')
+app.use('/logins', login)
 let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
-let login = require('./routes/user/login')
-app.use('/login', login)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

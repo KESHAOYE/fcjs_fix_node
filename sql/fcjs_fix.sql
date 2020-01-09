@@ -82,13 +82,6 @@ CREATE TABLE `brandinfo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='品牌表';
 
 -- ----------------------------
--- Records of brandinfo
--- ----------------------------
-BEGIN;
-INSERT INTO `brandinfo` VALUES ('6e6f968c18f011eaaa2f8013df241707', '小米', 'xiaomi', 0);
-COMMIT;
-
--- ----------------------------
 -- Table structure for comment_info
 -- ----------------------------
 DROP TABLE IF EXISTS `comment_info`;

@@ -4,27 +4,25 @@
 
 const mysql = require("mysql")
 
-var pool = mysql.createPool({
-    host: "localhost",
-    port: "3306",
-    user: "root",
-    password: "LKW54321likewei.",
-    database: "fcjs_fix"
-})
-
-var query = function(sql, callback) {
-    pool.getConnection(function(err, conn) {
-        if (err) {
-            callback(err, null, null);
-        } else {
-            conn.query(sql, function(qerr, vals, fields) {
-                //释放连接
-                conn.release();
-                //事件驱动回调
-                callback(qerr, vals, fields);
-            });
-        }
-    });
-};
-
-module.exports = query
+let connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'LKW54321likewei.',
+    database: 'fcjs_fix'
+});
+module.exports = {
+    query: (sql, params, callback) => {
+        
+        connection.query(sql, params, function (err, data, fields) {
+            callback && callback(err, data, fields)
+        })
+    },
+    end: ()=>{
+        connection.end(function (err) {
+            if (err) {
+                console.log('关闭数据库连接失败！');
+                throw err;
+            }
+        })
+    }
+}

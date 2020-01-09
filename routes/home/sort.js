@@ -76,10 +76,8 @@ var root = {
   }
 }
 
-router.use('/',egraph({
-    schema:schema,
-    rootValue:root,
-    graphiql: true
-}))
+router.post('/',(req,res,next)=>{
+   console.log(req.query)
+})
 
 module.exports = router
