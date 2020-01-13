@@ -18,14 +18,23 @@ async function existUser(phone) {
         return Promise.resolve(200)
     }
 }
-
+async function existId(id) {
+    let sql = `select count(1) as count from userinfo where id = ${id}`
+    let query = await mysql(sql)
+    if (query[0].count > 0) {
+        return Promise.resolve(403)
+    } else {
+        return Promise.resolve(200)
+    }
+}
 // 注册
 app.use('/REGISTERNEW', async(req, res, next) => {
     let {
-        username,
+        name,
         phone,
         password
-    } = req.query
+    } = req.body
+    console.log(req.body)
     let passwords = key.encrypt(password, 'base64')
     let regisiterTime = time.getTime()
     let userId = time.nowTimeStamp() + Math.floor(Math.random() * 10000 + 1)
@@ -37,7 +46,7 @@ app.use('/REGISTERNEW', async(req, res, next) => {
         })
     } else {
         //插入语句
-        let sql = `insert into userinfo(user_id,username,phone,password,regisitertime) values('${userId}','${username}','${phone}','${passwords}','${regisiterTime}');`
+        let sql = `insert into userinfo(user_id,username,phone,password,regisitertime) values('${userId}','${name}','${phone}','${passwords}','${regisiterTime}');`
         let query = mysql(sql)
             .then(data => {
                 res.json({
@@ -57,7 +66,7 @@ app.use('/REGISTERNEW', async(req, res, next) => {
 
 // 资料补齐
 app.use('/FULLINFO', async(req, res, next) => {
-
+    console.log(req.body)
 })
 
 module.exports = app

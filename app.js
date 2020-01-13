@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
- 
+
 const http = require('http')
     //引入socket服务
 const chat = require('./util/chat')
@@ -46,6 +46,8 @@ let login = require('./routes/user/login')
 app.use('/logins', login)
 let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
+let register = require('./routes/user/register')
+app.use('/register', register)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {
