@@ -1,4 +1,8 @@
-// 获取时间 或 时间戳
+/**
+ * 时间方法，用于获取时间或时间戳
+ * Author: KESHAOYE
+ * Date: 2020-1-8
+ */
 class Time {
     // 时间戳转 YYYY-MM-DD HH:MM:SS
     timeStampToTime() {

@@ -9,8 +9,14 @@ let pool = mysql.createPool({
     user: 'root',
     password: 'LKW54321likewei.',
     database: 'fcjs_fix'
-});
-
+})
+pool.getConnection((err)=>{
+  if(err) {
+      console.log(`数据库未连接！请连接数据库后刷新`)
+  } else {
+      console.log(`数据库连接成功`);
+  }
+})
 let query = function(sql, values) {
     // 返回一个 Promise
     return new Promise((resolve, reject) => {
@@ -19,7 +25,6 @@ let query = function(sql, values) {
                 reject(err)
             } else {
                 connection.query(sql, values, (err, rows) => {
-
                     if (err) {
                         reject(err)
                     } else {
