@@ -1,16 +1,23 @@
 const express = require('express')
 const mysql = require('../../util/db')
 const token = require('../../util/token')
-const nodersa = require('node-rsa')
+var utility=require("utility");
 const time = require('../../util/time')
+let tokens = new token()
 let app = express()
-
-let key = new nodersa({
-    b: 512
-})
 
 async function existUser(phone) {
     let sql = `select count(1) as count from userinfo where phone = ${phone}`
+    let query = await mysql(sql)
+    if (query[0].count > 0) {
+        return Promise.resolve(403)
+    } else {
+        return Promise.resolve(200)
+    }
+}
+
+async function existId(id) {
+    let sql = `select count(1) as count from userinfo where user_id = ${id}`
     let query = await mysql(sql)
     if (query[0].count > 0) {
         return Promise.resolve(403)
@@ -24,34 +31,81 @@ app.use('/LOGINU', async(req, res, next) => {
     let {
         phone,
         password
-    } = req.query
-    let passwords = key.encrypt(password, 'base64')
-    let regisiterTime = time.getTime()
-    let userId = time.nowTimeStamp() + Math.floor(Math.random() * 10000 + 1)
+    } = req.body
+    let passwords = utility.md5(password)
     let code = await existUser(phone)
-    if (code === 403) {
+    if (code === 200) {
         res.json({
             code: 600,
-            message: '已经存在相同的手机号,请直接前往登录'
+            message: '不存在此用户'
         })
     } else {
         //插入语句
-        let sql = `insert into userinfo(user_id,phone,password,regisitertime) values('${userId}','${phone}','${passwords}','${regisiterTime}');`
-        let query = mysql(sql)
+        let sql = `select count(1) as count from userinfo where phone = '${phone}' and password = '${passwords}'`
+        let utokens = tokens.newToken(phone)
+       mysql(sql)
             .then(data => {
+                if(data[0].count > 0){
                 res.json({
                     code: 200,
-                    message: '注册成功',
-                    userId: userId
+                    message: '登录成功',
+                    _T_: utokens
                 })
+               }else{
+                res.json({
+                    code: 600,
+                    message: '密码错误'
+                })  
+               }
             })
             .catch(err => {
+                console.log(err);
                 res.json({
                     code: 600,
                     message: err
                 })
             })
     }
+})
+
+app.use('/GETUSERINFO', async (req,res,next) => {
+  console.log(req.header)
+  let {id} = req.body
+  let code = await existId(id)
+  if(code === 403){
+    let sql = `select * from userinfo where user_id = '${id}'`
+    mysql(sql)
+    .then(data => {
+        console.log(data)
+         let d = data[0]
+        const result = {
+          username: d.username,
+          sex: {1:'男',2:'女'}[d.sex],
+          id: d.id,
+          name:d.name,
+          phone: d.phone,
+          birth: d.birthday,
+          headimg: d.headimg === null ? 'https://localhost:3000/public/user/default.png' : `https://localhost:3000${d.headimg}`,
+          isname: {1:'男',2:'女'}[d.isname] 
+        }
+        res.json({
+            code: 200,
+            status: true,
+            info: result
+        })
+    })
+    .catch(err => {
+        res.json({
+            code: 600,
+            message: err
+        })
+    })
+  }else{
+      res.json({
+        code: 600,
+        message: '不存在此用户'
+      })
+  }
 })
 
 module.exports = app

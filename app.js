@@ -23,10 +23,6 @@ var sortRouter = require('./routes/home/sort')
 
 var app = express();
 
-var bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -43,7 +39,7 @@ app.use('/brand', brandRouter);
 app.use('/fixmodel', fixmodelRouter)
 app.use('/sort', sortRouter)
 let login = require('./routes/user/login')
-app.use('/logins', login)
+app.use('/login', login)
 let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
 let register = require('./routes/user/register')

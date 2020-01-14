@@ -1,13 +1,16 @@
 const express = require('express')
 const mysql = require('../../util/db')
-const token = require('../../util/token')
-const nodersa = require('node-rsa')
+// 加密
+var utility=require("utility");
+// 时间获取
 const time = require('../../util/time')
-let app = express()
+// 图片处理
+const img = require('../../util/img')
+const imgs = new img()
+const regs = require('../../util/reg')
+const reg = new regs()
 
-let key = new nodersa({
-    b: 512
-})
+let app = express()
 
 async function existUser(phone) {
     let sql = `select count(1) as count from userinfo where phone = ${phone}`
@@ -18,13 +21,13 @@ async function existUser(phone) {
         return Promise.resolve(200)
     }
 }
-async function existId(id) {
-    let sql = `select count(1) as count from userinfo where id = ${id}`
+async function existId(id, phone) {
+    let sql = `select count(1) as count from userinfo where user_id = ${id} and phone = ${phone}`
     let query = await mysql(sql)
     if (query[0].count > 0) {
-        return Promise.resolve(403)
-    } else {
         return Promise.resolve(200)
+    } else {
+        return Promise.resolve(403)
     }
 }
 // 注册
@@ -34,8 +37,34 @@ app.use('/REGISTERNEW', async(req, res, next) => {
         phone,
         password
     } = req.body
-    console.log(req.body)
-    let passwords = key.encrypt(password, 'base64')
+    reg.checkusername(name,(data) => {
+       if(data){
+          res.json({
+              code: 600,
+              message: data
+          })
+          return
+       }
+    })
+    reg.checkphonenumber(phone,(data) => {
+        if(data){
+           res.json({
+               code: 600,
+               message: data
+           })
+           return 
+        }
+     })
+     reg.checkpassword(password, (data) => {
+        if(data){
+           res.json({
+               code: 600,
+               message: data
+           })
+           return
+        }
+     })
+    let passwords = utility.md5(password)
     let regisiterTime = time.getTime()
     let userId = time.nowTimeStamp() + Math.floor(Math.random() * 10000 + 1)
     let code = await existUser(phone)
@@ -47,7 +76,7 @@ app.use('/REGISTERNEW', async(req, res, next) => {
     } else {
         //插入语句
         let sql = `insert into userinfo(user_id,username,phone,password,regisitertime) values('${userId}','${name}','${phone}','${passwords}','${regisiterTime}');`
-        let query = mysql(sql)
+        mysql(sql)
             .then(data => {
                 res.json({
                     code: 200,
@@ -66,7 +95,56 @@ app.use('/REGISTERNEW', async(req, res, next) => {
 
 // 资料补齐
 app.use('/FULLINFO', async(req, res, next) => {
-    console.log(req.body)
+    let {userId, phone, id, name, birth, sex, head} = req.body
+    reg.checkphonenumber(phone, data=>{
+        if(data){
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
+        }
+    })
+    reg.checkmanid(id, data=>{
+        if(data){
+        res.json({
+            code:600,
+            message: data
+        })
+        return
+      }
+    })
+    reg.checkname(name,data => {
+        if(data){
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
+        }
+    })
+    let query = await existId(userId, phone)
+    if(query === 403){
+        res.json({
+          code: 600,
+          message: '不存在该用户，无法修改信息'
+        })
+    } else {
+        let headimg = head != '' ? imgs.saveImg(head) : ''
+        let sql = `update userinfo set id = '${id}', birthday = '${birth}', name = '${name}', sex = '${sex}', isname = '1', nametime = '${time.getTime()}', headimg = '${headimg}'`
+        mysql(sql).then(data=>{
+            res.json({
+                code: 200,
+                message: '已完善'
+            })
+        })
+        .catch(err=>{
+            res.json({
+                code: 600,
+                message: err
+            })
+        }) 
+    }
 })
 
 module.exports = app
