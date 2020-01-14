@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 09/01/2020 17:05:57
+ Date: 14/01/2020 17:27:50
 */
 
 SET NAMES utf8mb4;
@@ -296,21 +296,6 @@ CREATE TABLE `sortinfo`  (
 INSERT INTO `sortinfo` VALUES (1, '手机', 1, '2020-01-02 21:49:46.717000', 'PHONE');
 
 -- ----------------------------
--- Table structure for token
--- ----------------------------
-DROP TABLE IF EXISTS `token`;
-CREATE TABLE `token`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-用户手机号',
-  `token` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'token值',
-  `createTime` datetime(6) NOT NULL ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '创建时间',
-  `mac` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '机器物理地址',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `token_username`(`username`) USING BTREE,
-  CONSTRAINT `token_username` FOREIGN KEY (`username`) REFERENCES `userinfo` (`phone`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = 'Token表，用于存放用户登录后生成的token' ROW_FORMAT = Dynamic;
-
--- ----------------------------
 -- Table structure for user_pay
 -- ----------------------------
 DROP TABLE IF EXISTS `user_pay`;
@@ -334,7 +319,7 @@ DROP TABLE IF EXISTS `userinfo`;
 CREATE TABLE `userinfo`  (
   `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1000' COMMENT '用户id，唯一，规则时间戳+random',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户昵称',
-  `sex` tinyint(1) NULL DEFAULT NULL COMMENT '用户性别，默认为男，用数字1，2代替',
+  `sex` tinyint(1) NULL DEFAULT 1 COMMENT '用户性别，默认为男，用数字1，2代替',
   `id` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '国内身份证，实名制标记',
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户真实姓名，实名制标记',
   `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '用户电话号码，常用，不可缺。',
@@ -344,7 +329,7 @@ CREATE TABLE `userinfo`  (
   `headimg` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户头像，不为空，若用户不设置有默认头像。',
   `lastmoney` decimal(8, 2) NULL DEFAULT 0.00 COMMENT '用户余额',
   `regisitertime` datetime(6) NOT NULL COMMENT '注册时间',
-  `isname` tinyint(1) NULL DEFAULT NULL COMMENT '是否实名制',
+  `isname` tinyint(1) NULL DEFAULT 1 COMMENT '是否实名制',
   `nametime` datetime(6) NULL DEFAULT NULL COMMENT '实名制时间',
   PRIMARY KEY (`user_id`) USING BTREE,
   INDEX `phone`(`phone`) USING BTREE
@@ -353,6 +338,7 @@ CREATE TABLE `userinfo`  (
 -- ----------------------------
 -- Records of userinfo
 -- ----------------------------
-INSERT INTO `userinfo` VALUES ('1578565722', NULL, NULL, NULL, NULL, '15359639480', NULL, NULL, 'q88PzoS85sr/D3+HVD0dCrUs7cMp2wX8Ec7q4tFXEnXZ5azj2c10WNTijJ0is6lQPuAzDt03hOy5uPX5BF1nNg==', NULL, 0.00, '2020-01-09 16:39:56.000000', NULL, NULL);
+INSERT INTO `userinfo` VALUES ('1578994442', '111', 1, NULL, NULL, '15359639488', NULL, NULL, '96e79218965eb72c92a549dd5a330112', NULL, 0.00, '2020-01-14 17:22:20.000000', 1, NULL);
+INSERT INTO `userinfo` VALUES ('1578994564', 'KE', 1, NULL, NULL, '15005097517', NULL, NULL, 'e10adc3949ba59abbe56e057f20f883e', NULL, 0.00, '2020-01-14 17:20:44.000000', 1, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
