@@ -1,10 +1,10 @@
 const express = require('express')
 const mysql = require('../../util/db')
-// 加密
-var utility=require("utility");
+    // 加密
+var utility = require("utility");
 // 时间获取
 const time = require('../../util/time')
-// 图片处理
+    // 图片处理
 const img = require('../../util/img')
 const imgs = new img()
 const regs = require('../../util/reg')
@@ -37,33 +37,33 @@ app.use('/REGISTERNEW', async(req, res, next) => {
         phone,
         password
     } = req.body
-    reg.checkusername(name,(data) => {
-       if(data){
-          res.json({
-              code: 600,
-              message: data
-          })
-          return
-       }
+    reg.checkusername(name, (data) => {
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
+        }
     })
-    reg.checkphonenumber(phone,(data) => {
-        if(data){
-           res.json({
-               code: 600,
-               message: data
-           })
-           return 
+    reg.checkphonenumber(phone, (data) => {
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
         }
-     })
-     reg.checkpassword(password, (data) => {
-        if(data){
-           res.json({
-               code: 600,
-               message: data
-           })
-           return
+    })
+    reg.checkpassword(password, (data) => {
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
         }
-     })
+    })
     let passwords = utility.md5(password)
     let regisiterTime = time.getTime()
     let userId = time.nowTimeStamp() + Math.floor(Math.random() * 10000 + 1)
@@ -95,9 +95,10 @@ app.use('/REGISTERNEW', async(req, res, next) => {
 
 // 资料补齐
 app.use('/FULLINFO', async(req, res, next) => {
-    let {userId, phone, id, name, birth, sex, head} = req.body
-    reg.checkphonenumber(phone, data=>{
-        if(data){
+    let { userid, phone, id, name, birth, sex, headimg } = req.body
+    console.log(req.body)
+    reg.checkphonenumber(phone, data => {
+        if (data) {
             res.json({
                 code: 600,
                 message: data
@@ -105,17 +106,8 @@ app.use('/FULLINFO', async(req, res, next) => {
             return
         }
     })
-    reg.checkmanid(id, data=>{
-        if(data){
-        res.json({
-            code:600,
-            message: data
-        })
-        return
-      }
-    })
-    reg.checkname(name,data => {
-        if(data){
+    reg.checkmanid(id, data => {
+        if (data) {
             res.json({
                 code: 600,
                 message: data
@@ -123,27 +115,46 @@ app.use('/FULLINFO', async(req, res, next) => {
             return
         }
     })
-    let query = await existId(userId, phone)
-    if(query === 403){
+    reg.checkname(name, data => {
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
+        }
+    })
+    console.log(userid, phone)
+    let query = await existId(userid, phone)
+    if (query === 403) {
         res.json({
-          code: 600,
-          message: '不存在该用户，无法修改信息'
+            code: 600,
+            message: '不存在该用户，无法修改信息'
         })
     } else {
-        let headimg = head != '' ? imgs.saveImg(head) : ''
-        let sql = `update userinfo set id = '${id}', birthday = '${birth}', name = '${name}', sex = '${sex}', isname = '1', nametime = '${time.getTime()}', headimg = '${headimg}'`
-        mysql(sql).then(data=>{
-            res.json({
-                code: 200,
-                message: '已完善'
-            })
-        })
-        .catch(err=>{
+        let head = headimg != '' ? imgs.saveImg('./public/userHead/', headimg) : ''
+        if (head == 'Error: 您上传的不是图片') {
             res.json({
                 code: 600,
-                message: err
+                message: '您上传的不是图片'
             })
-        }) 
+            return
+        }
+        let sexs = { '男': 1, '女': 2 }[sex]
+        let sql = `update userinfo set id = '${id}', birthday = '${birth}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
+        console.log(sql)
+        mysql(sql).then(data => {
+                res.json({
+                    code: 200,
+                    message: '已完善'
+                })
+            })
+            .catch(err => {
+                res.json({
+                    code: 600,
+                    message: err
+                })
+            })
     }
 })
 

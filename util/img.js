@@ -32,7 +32,7 @@ class img {
          * @param{*} filename 文件名
          */
     checkexist(path, type) {
-        type = type == '' ? '.png' : type
+        let types = type == null ? '.png' : type
         var time = new Date()
         var filename = time.getFullYear().toString() + (time.getMonth() + 1).toString() + (time.getDay() + 1).toString() + time.getHours().toString() + time.getMinutes().toString() + time.getSeconds().toString() + time.getMilliseconds().toString() + (Math.ceil(Math.random() * 100)).toString()
         if (fs.existsSync("./public/" + path + filename)) {
@@ -42,7 +42,7 @@ class img {
                 return new Error("发生错误")
             }
         } else {
-            return filename + type
+            return filename + types
         }
     }
 
