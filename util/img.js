@@ -57,7 +57,8 @@ class img {
                     return new Error(err)
                 }
             })
-            return path + el
+            let reg = new RegExp(/^.\/public/)
+            return path.replace(reg, '') + el
         } else {
             return new Error("您上传的不是图片")
         }

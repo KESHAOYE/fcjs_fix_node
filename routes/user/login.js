@@ -70,10 +70,13 @@ app.use('/LOGINU', async(req, res, next) => {
 
 app.use('/GETUSERINFO', async(req, res, next) => {
     console.log(req.header)
-    let { id } = req.body
-    let code = await existId(id)
+    let { id, phone } = req.body
+    console.log(id, phone)
+    let code = id ? await existId(id) : await existUser(phone)
+    console.log(code)
     if (code === 403) {
-        let sql = `select * from userinfo where user_id = '${id}'`
+        let sql = id ? `select * from userinfo where user_id = '${id}'` : `select * from userinfo where phone = '${phone}'`
+        console.log(sql)
         mysql(sql)
             .then(data => {
                 console.log(data)
@@ -86,7 +89,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
                     name: d.name,
                     phone: d.phone,
                     birth: d.birthday,
-                    headimg: d.headimg === null ? 'https://localhost:3000/public/user/default.png' : `https://localhost:3000${d.headimg}`,
+                    headimg: d.headimg === null ? 'http://localhost:3000/public/user/default.png' : `http://localhost:3000${d.headimg}`,
                     isname: { 1: true, 2: false }[d.isname]
                 }
                 res.json({
