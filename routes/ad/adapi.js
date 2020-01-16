@@ -1,54 +1,58 @@
-// const express = require("express");
-// const mysql = require('../../util/db')
-// const img = require('../../util/img')
-// const router = express.Router();
-// const imgutil = new img();
+const express = require("express");
+const mysql = require('../../util/db')
+const img = require('../../util/img')
+const router = express.Router();
+const imgutil = new img();
 
 // /**
 //  * 广告接口 
 //  */
-// let schema = graphql.buildSchema(`
-//   type adInfo{
-//     id: ID!,
-//     adid:Int,
-//     adimg:String,
-//     createTime:String,
-//     startdue:String,
-//     overdue:String,
-//     priority:Int,
-//     shopid:String,
-//     clickcount:Int,
-//     create_man:String
-//   },
-//   input adinfo{
-//     adid:Int,
-//     adimg:String,
-//     createTime:String,
-//     startdue:String,
-//     overdue:String,
-//     priority:Int,
-//     shopid:String,
-//     clickcount:Int,
-//     create_man:String
-//   },
-//   type Query{
-//       adinfos(adid: Int):[adInfo]
-//   }
-//   type Mutation{
-//       insertAd(input:adinfo):adInfo
-//       updateAD(id:ID!,adid:Int,adimg:String,startdue:String,overdue:String,priority:Int,create_man:String):adInfo
-//       updateCount(id:ID!,clickcount:Int):adInfo
-//   }
-// `)
-// /**
-//  * 
-//  * @param {*} String Base64格式图片
-//  * return 存储路径 localhost:3000/ad/..
-//  * (命名规则)
-//  */
-// const saveImg = (string) => {
-//   return imgutil.saveImg("./public/ad/", string)
-// }
+
+app.use('/GETAD', (res, req, next) => {
+
+    })
+    // let schema = graphql.buildSchema(`
+    //   type adInfo{
+    //     id: ID!,
+    //     adid:Int,
+    //     adimg:String,
+    //     createTime:String,
+    //     startdue:String,
+    //     overdue:String,
+    //     priority:Int,
+    //     shopid:String,
+    //     clickcount:Int,
+    //     create_man:String
+    //   },
+    //   input adinfo{
+    //     adid:Int,
+    //     adimg:String,
+    //     createTime:String,
+    //     startdue:String,
+    //     overdue:String,
+    //     priority:Int,
+    //     shopid:String,
+    //     clickcount:Int,
+    //     create_man:String
+    //   },
+    //   type Query{
+    //       adinfos(adid: Int):[adInfo]
+    //   }
+    //   type Mutation{
+    //       insertAd(input:adinfo):adInfo
+    //       updateAD(id:ID!,adid:Int,adimg:String,startdue:String,overdue:String,priority:Int,create_man:String):adInfo
+    //       updateCount(id:ID!,clickcount:Int):adInfo
+    //   }
+    // `)
+    // /**
+    //  * 
+    //  * @param {*} String Base64格式图片
+    //  * return 存储路径 localhost:3000/ad/..
+    //  * (命名规则)
+    //  */
+    // const saveImg = (string) => {
+    //   return imgutil.saveImg("./public/ad/", string)
+    // }
 
 // var root = {
 //   /**
@@ -161,7 +165,7 @@
 //   }
 // }
 // router.post("/", (req, res, next) => {
-   
+
 // })
 
 // module.exports = router;

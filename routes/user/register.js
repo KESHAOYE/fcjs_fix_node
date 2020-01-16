@@ -96,7 +96,6 @@ app.use('/REGISTERNEW', async(req, res, next) => {
 // 资料补齐
 app.use('/FULLINFO', async(req, res, next) => {
     let { userid, phone, id, name, birth, sex, headimg } = req.body
-    console.log(req.body)
     reg.checkphonenumber(phone, data => {
         if (data) {
             res.json({
@@ -124,7 +123,6 @@ app.use('/FULLINFO', async(req, res, next) => {
             return
         }
     })
-    console.log(userid, phone)
     let query = await existId(userid, phone)
     if (query === 403) {
         res.json({
@@ -142,7 +140,6 @@ app.use('/FULLINFO', async(req, res, next) => {
         }
         let sexs = { '男': 1, '女': 2 }[sex]
         let sql = `update userinfo set id = '${id}', birthday = '${birth}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
-        console.log(sql)
         mysql(sql).then(data => {
                 res.json({
                     code: 200,

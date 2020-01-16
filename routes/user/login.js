@@ -26,26 +26,26 @@ async function existId(id) {
     }
 }
 //通过token
-app.use('/LOGINAUTO',async(req,res,next)=>{
-  let {phone,token} = req.body
-  let t = tokens.checkToken(phone, token)
-  t.then(data=>{
-    res.json({
-        code: 200,
-        message: '登录成功',
-        _T_:data,
-        phone: phone
+app.use('/LOGINAUTO', async(req, res, next) => {
+        let { phone, token } = req.body
+        let t = tokens.checkToken(phone, token)
+        t.then(data => {
+                res.json({
+                    code: 200,
+                    message: '登录成功',
+                    _T_: data,
+                    phone: phone
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                res.json({
+                    code: 600,
+                    message: err
+                })
+            })
     })
-  })
-  .catch(err=>{
-      console.log(err)
-      res.json({
-          code: 600,
-          message: err
-      })
-  })
-})
-// 通过账号密码登录
+    // 通过账号密码登录
 app.use('/LOGINU', async(req, res, next) => {
     let {
         phone,
