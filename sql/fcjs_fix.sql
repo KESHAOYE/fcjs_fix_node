@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 14/01/2020 17:27:50
+ Date: 16/01/2020 17:24:55
 */
 
 SET NAMES utf8mb4;
@@ -250,6 +250,7 @@ CREATE TABLE `shop_specs`  (
   `specs_price` decimal(10, 2) NOT NULL COMMENT '规格对应价格',
   `specs_img` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '规格对应图片',
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
+  `count` int(11) NOT NULL COMMENT '库存',
   PRIMARY KEY (`specs_id`) USING BTREE,
   INDEX `shopid`(`shopid`) USING BTREE,
   CONSTRAINT `shopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
