@@ -25,7 +25,26 @@ async function existId(id) {
         return Promise.resolve(200)
     }
 }
-
+//通过token
+app.use('/LOGINAUTO',async(req,res,next)=>{
+  let {phone,token} = req.body
+  let t = tokens.checkToken(phone, token)
+  t.then(data=>{
+    res.json({
+        code: 200,
+        message: '登录成功',
+        _T_:data,
+        phone: phone
+    })
+  })
+  .catch(err=>{
+      console.log(err)
+      res.json({
+          code: 600,
+          message: err
+      })
+  })
+})
 // 通过账号密码登录
 app.use('/LOGINU', async(req, res, next) => {
     let {
@@ -59,7 +78,6 @@ app.use('/LOGINU', async(req, res, next) => {
                 }
             })
             .catch(err => {
-                console.log(err);
                 res.json({
                     code: 600,
                     message: err
@@ -69,17 +87,12 @@ app.use('/LOGINU', async(req, res, next) => {
 })
 
 app.use('/GETUSERINFO', async(req, res, next) => {
-    console.log(req.header)
     let { id, phone } = req.body
-    console.log(id, phone)
     let code = id ? await existId(id) : await existUser(phone)
-    console.log(code)
     if (code === 403) {
         let sql = id ? `select * from userinfo where user_id = '${id}'` : `select * from userinfo where phone = '${phone}'`
-        console.log(sql)
         mysql(sql)
             .then(data => {
-                console.log(data)
                 let d = data[0]
                 const result = {
                     userid: d.user_id,
@@ -89,7 +102,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
                     name: d.name,
                     phone: d.phone,
                     birth: d.birthday,
-                    headimg: d.headimg === null ? 'http://localhost:3000/public/user/default.png' : `http://localhost:3000${d.headimg}`,
+                    headimg: d.headimg === null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${d.headimg}`,
                     isname: { 1: true, 2: false }[d.isname]
                 }
                 res.json({

@@ -44,6 +44,8 @@ let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
 let register = require('./routes/user/register')
 app.use('/register', register)
+let order = require('./routes/user/order')
+app.use('/order', order)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {
