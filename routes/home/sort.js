@@ -2,7 +2,9 @@ const express = require("express");
 const graphql = require('graphql');
 const egraph = require('express-graphql')
 const mysql = require('../../util/db')
-const router = express();
+const app = express();
+const token = require('../../util/token')
+
 
 var schema = graphql.buildSchema(`
  type sort{
@@ -80,4 +82,4 @@ router.post('/',(req,res,next)=>{
    console.log(req.query)
 })
 
-module.exports = router
+module.exports = app

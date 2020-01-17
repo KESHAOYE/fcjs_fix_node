@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 16/01/2020 17:24:55
+ Date: 17/01/2020 17:00:07
 */
 
 SET NAMES utf8mb4;
@@ -48,7 +48,6 @@ CREATE TABLE `adinfo`  (
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
   `overdue` datetime(6) NOT NULL COMMENT '过期时间',
   `create_man` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-对应员工号，添加人',
-  `clickcount` int(11) NOT NULL DEFAULT 0 COMMENT '点击次数',
   `startdue` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '开始时间',
   `priority` int(11) NOT NULL COMMENT '优先级-1为最高',
   PRIMARY KEY (`id`) USING BTREE,

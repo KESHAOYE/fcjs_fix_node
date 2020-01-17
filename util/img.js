@@ -22,8 +22,8 @@ class img {
         return dataBuffer
     }
     imgtobase(path) {
-            let bitmap = fs.readFileSync(path)
-            let base64str = Buffer.from(bitmap, 'binary').toString('base64'); // base64编码
+            let file = fs.readFileSync(path)
+            let base64str = Buffer.from(file, 'binary').toString('base64'); // base64编码
             base64str = "data:" + type.lookup(path) + ";base64," + base64str
             return base64str;
         }
