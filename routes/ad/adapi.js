@@ -62,13 +62,13 @@ app.use('/ADDAD',(req,res,next)=>{
 })
 //更改广告
 app.use('/UPDATEAD',(req,res,next)=>{
-    let {id,adid,adimg,startdue,overdue,priority,shopid,createMan,phone} = req.body
+    let {id,adid,adimg,startdue,overdue,priority,shopid,phone} = req.body
     let _t_ = req.headers.authorization
     let imgs = imgutil.saveImg(adimg)
     let t = tokens.checkToken(phone,_t_)
     const ct = time.getTime()
     t.then(data=>{
-      let sql = `update adinfo set adid = ${adid}, adimg = ${imgs}, shopid = ${shopid} , startdue = ${startdue} , overdue = ${overdue} , priority = ${priority} ,create_man = ${createMan} where id = ${id}`
+      let sql = `update adinfo set adid = ${adid}, adimg = ${imgs}, shopid = ${shopid} , startdue = ${startdue} , overdue = ${overdue} , priority = ${priority} where id = ${id}`
       mysql(sql).then(data=>{
         res.json({
             code: 200,
@@ -89,6 +89,32 @@ app.use('/UPDATEAD',(req,res,next)=>{
         })
     })
 })
-    
+// 删除广告
+app.use('/DELETEAD',(req,res,next)=>{
+  let {id} = req.body
+  let _t_ = req.headers.authorization
+  let t = tokens.checkToken(phone,_t_)
+  t.then(data=>{
+    let sql = `update adinfo set isshow = ${0} where id = ${id}`
+    mysql(sql).then(data=>{
+      res.json({
+          code: 200,
+          message: '删除成功'
+      })
+    })
+    .catch(err=>{
+        res.json({
+          code: 600,
+          message: err
+        })
+    })
+  })
+  .catch(err=>{
+      res.json({
+        code: 600,
+        message: '你没有权限' + err
+      })
+  })
+})
 
  module.exports = app;

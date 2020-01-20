@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const fs = require('fs')
+var FileStreamRotator = require('file-stream-rotator');
+const time = require('./util/time')
 
 const http = require('http')
     //引入socket服务
@@ -27,7 +30,19 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
+var logDirectory=__dirname+'/logs';
+//确保日志文件目录存在 没有则创建
+fs.existsSync(logDirectory)||fs.mkdirSync(logDirectory);
+
+//创建一个写路由
+var accessLogStream=FileStreamRotator.getStream({
+filename:logDirectory+'/accss-%DATE%.log',
+frequency:'daily',
+verbose:false
+})
+
+logger.format('fcjs',`[福城建设-接口监控平台]:方法:method  路径:url  状态:status`)
+app.use(logger('fcjs',{stream:accessLogStream}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
