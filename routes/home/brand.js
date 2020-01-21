@@ -1,97 +1,46 @@
 const express = require("express");
-const graphql = require('graphql');
-const egraph = require('express-graphql')
 const mysql = require('../../util/db')
-const router = express();
+const app = express();
+const token = require('../../util/token')
+const tokens = new token()
+const uuid = require('node-uuid')
 
-var schema=graphql.buildSchema(`
-  type brandInfo{
-    brandid:ID!,
-    brandname:String,
-    brandename:String,
-    isfix:Int
-  }  
-  type Query{
-      brandInfo:[brandInfo]
-  }
-  input inputBrand{
-    brandid:ID!,
-    brandname:String,
-    brandename:String,
-    isfix:Int
-  }
-  type Mutation{
-      insertBrand(input:inputBrand):brandInfo
-      updateBrand(input:inputBrand):brandInfo
-  }
-`)
-
-var root={
-    brandInfo(){
-        return new Promise((resolve,reject)=>{
-        mysql.query("select * from brandinfo",(err,data)=>{
-            if (err) {
-              reject(err)
-            }
-            resolve(data)
+// 获取全部品牌
+app.use('/GETBRAND', (req, res, next) => {
+    let sql = `select * from  brandinfo`
+    mysql(sql)
+        .then(data => {
+            res.json({
+                code: 200,
+                status: true,
+                info: data
+            })
         })
-    })
-    },
-    insertBrand({
-      input
-    }){
-        const data = {
-          brandid:input.brandid,
-          brandname:input.brandname,
-          brandename:input.brandename,
-          isfix:input.isfix
-        }
-        return new Promise((resolve,reject)=>{
-        mysql.query("insert into brandinfo set ?",data,(err,) => {
-           if (err) {
-               reject(JSON.stringify({
-                   code:"410",
-                   message:`失败${err}`
-               }))
-           } else {
-               resolve(JSON.stringify({
-                   code:'200',
-                   message:'success'
-               }))
-           }
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: err
+            })
         })
-      }) 
-    },
-    updateBrand({
-      input
-    }){
-      const data={
-        brandname:input.brandname,
-        brandename:input.brandename,
-        isfix:input.isfix
-      }
-      return new Promise((resolve,reject)=>{
-      mysql.query("update brandinfo set ? where brandid = ?",[data,input.brandid],(err,data)=>{
-        if(err){
-          reject(JSON.stringify({
-            code:"410",
-            message:err
-          }))
-        } else {
-          resolve(JSON.stringify({
-            code:"200",
-            message:"success"
-          }))
-        }
-      })
-    })
-    }
-}
+})
 
-router.use("/",egraph({
-    schema:schema,
-    rootValue:root,
-    graphiql:true
-}))
+// 获取维修品牌
+app.use('/GETFIXBRAND', (req, res, next) => {
+    let sql = `select * from  brandinfo where isfix = '1'`
+    mysql(sql)
+        .then(data => {
+            res.json({
+                code: 200,
+                status: true,
+                info: data
+            })
+        })
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: err
+            })
+        })
+})
 
-module.exports=router
+module.exports = app

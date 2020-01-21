@@ -12,7 +12,7 @@ app.use('/GETSORT', (req, res, next) => {
     mysql(sql)
         .then(data => {
             let b = []
-            data.forEach(function (cur) {
+            data.forEach(function(cur) {
                 let index = b.findIndex((item) => item.sortid == cur.sortid)
                 if (index != -1) {
                     let object = {
@@ -87,7 +87,7 @@ app.use('/ADDSORT', (req, res, next) => {
 
 //改变分类
 
-app.use('/UPDATESORT',(req,res,next)=>{
+app.use('/UPDATESORT', (req, res, next) => {
     let {
         sortid,
         sortname,
@@ -124,31 +124,31 @@ app.use('/UPDATESORT',(req,res,next)=>{
 
 //删除分类
 
-app.use('/DELETESORT',(req,res,next)=>{
-    let {id} = req.body
+app.use('/DELETESORT', (req, res, next) => {
+    let { id } = req.body
     let _t_ = req.headers.authorization
-    let t = tokens.checkToken(phone,_t_)
-    t.then(data=>{
-      let sql = `update sortinfo set isshow = ${0} where id = ${id}`
-      mysql(sql).then(data=>{
-        res.json({
-            code: 200,
-            message: '删除成功'
+    let t = tokens.checkToken(phone, _t_)
+    t.then(data => {
+            let sql = `update sortinfo set isshow = ${0} where id = ${id}`
+            mysql(sql).then(data => {
+                    res.json({
+                        code: 200,
+                        message: '删除成功'
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: err
+                    })
+                })
         })
-      })
-      .catch(err=>{
-          res.json({
-            code: 600,
-            message: err
-          })
-      })
-    })
-    .catch(err=>{
-        res.json({
-          code: 600,
-          message: '你没有权限' + err
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: '你没有权限' + err
+            })
         })
-    })
 })
 
 module.exports = app

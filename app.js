@@ -30,19 +30,19 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-var logDirectory=__dirname+'/logs';
+var logDirectory = __dirname + '/logs';
 //确保日志文件目录存在 没有则创建
-fs.existsSync(logDirectory)||fs.mkdirSync(logDirectory);
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 
 //创建一个写路由
-var accessLogStream=FileStreamRotator.getStream({
-filename:logDirectory+'/accss-%DATE%.log',
-frequency:'daily',
-verbose:false
+var accessLogStream = FileStreamRotator.getStream({
+    filename: logDirectory + '/accss-%DATE%.log',
+    frequency: 'daily',
+    verbose: false
 })
 
-logger.format('fcjs',`[福城建设-接口监控平台]:方法:method  路径:url  状态:status`)
-app.use(logger('fcjs',{stream:accessLogStream}));
+logger.format('fcjs', `[福城建设-接口监控平台]:方法:method  路径:url  状态:status`)
+app.use(logger('fcjs', { stream: accessLogStream }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -61,6 +61,8 @@ let register = require('./routes/user/register')
 app.use('/register', register)
 let order = require('./routes/user/order')
 app.use('/order', order)
+let ad = require('./routes/ad/adapi')
+app.use('/ad', ad)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {
