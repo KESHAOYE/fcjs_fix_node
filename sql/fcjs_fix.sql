@@ -1,7 +1,7 @@
 /*
  Navicat MySQL Data Transfer
 
- Source Server         : 123
+ Source Server         : KESHAOYE
  Source Server Type    : MySQL
  Source Server Version : 50726
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 21/01/2020 17:21:44
+ Date: 21/01/2020 23:04:35
 */
 
 SET NAMES utf8mb4;
@@ -136,7 +136,7 @@ CREATE TABLE `coupon`  (
   `get_date` datetime(6) NOT NULL COMMENT '截至领取时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `coupon_id`(`coupon_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for express
@@ -385,11 +385,8 @@ CREATE TABLE `usercoupon`  (
   `use_status` tinyint(1) NOT NULL COMMENT '使用状态: 0->未使用 1-> 已使用  2-> 已过期',
   `use_time` datetime(6) NULL DEFAULT NULL COMMENT '使用时间',
   `order_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '外键:订单id',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `couponcid`(`coupon_id`) USING BTREE,
-  INDEX `couponorderid`(`order_id`) USING BTREE,
-  INDEX `couponuserid`(`user_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for userinfo
@@ -413,14 +410,5 @@ CREATE TABLE `userinfo`  (
   PRIMARY KEY (`user_id`) USING BTREE,
   INDEX `phone`(`phone`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户信息' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of userinfo
--- ----------------------------
-INSERT INTO `userinfo` VALUES ('1579012573', 'KEKE', 1, NULL, NULL, '15359639488', NULL, NULL, '96e79218965eb72c92a549dd5a330112', NULL, 0.00, '2020-01-14 22:07:18.000000', 2, NULL);
-INSERT INTO `userinfo` VALUES ('1579016000', 'KESHAOYE', 1, '350103199808141910', '李柯伟', '18960784341', '2020-01-15 22:46:48.577805', NULL, '25d55ad283aa400af464c76d713c07ad', '/userHead/default.png', 0.00, '2020-01-14 22:32:54.000000', 1, '2020-01-14 22:47:21.000000');
-INSERT INTO `userinfo` VALUES ('1579017318', 'KESHAOYE', 1, NULL, NULL, '15005097517', NULL, NULL, '25d55ad283aa400af464c76d713c07ad', NULL, 0.00, '2020-01-14 22:22:38.000000', 2, NULL);
-INSERT INTO `userinfo` VALUES ('1579021812', 'KEKE', 1, '350103199808141910', '李柯伟', '15366669999', '2020-01-15 22:46:20.077925', NULL, 'e10adc3949ba59abbe56e057f20f883e', '/userHead/default.png', 0.00, '2020-01-14 22:53:59.000000', 1, '2020-01-14 22:56:21.000000');
-INSERT INTO `userinfo` VALUES ('1579180837', 'KESHAOYE', 1, '350103199808141910', '李柯伟', '15359639480', '1998-08-14 00:00:00.000000', NULL, '25f9e794323b453885f5181f1b624d0b', '/userHead/20201521102533222.png', 0.00, '2020-01-16 21:09:57.000000', 1, '2020-01-16 21:10:25.000000');
 
 SET FOREIGN_KEY_CHECKS = 1;
