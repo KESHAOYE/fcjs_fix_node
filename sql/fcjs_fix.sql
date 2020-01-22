@@ -1,7 +1,7 @@
 /*
  Navicat MySQL Data Transfer
 
- Source Server         : KESHAOYE
+ Source Server         : 123
  Source Server Type    : MySQL
  Source Server Version : 50726
  Source Host           : localhost:3306
@@ -11,11 +11,25 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 21/01/2020 23:04:35
+ Date: 22/01/2020 14:32:23
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for adclick
+-- ----------------------------
+DROP TABLE IF EXISTS `adclick`;
+CREATE TABLE `adclick`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `adid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键：广告id',
+  `user` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ip地址 或 用户id',
+  `clickTime` datetime(6) NOT NULL COMMENT '点击时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `adclickid`(`adid`) USING BTREE,
+  CONSTRAINT `adclickid` FOREIGN KEY (`adid`) REFERENCES `adinfo` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for address_info
@@ -23,7 +37,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `address_info`;
 CREATE TABLE `address_info`  (
   `addressid` int(11) NOT NULL COMMENT '主键=地址id',
-  `userid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-用户id',
+  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-用户id',
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '收货人姓名',
   `phone` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '收货人电话',
   `area` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '地区',
@@ -32,9 +46,9 @@ CREATE TABLE `address_info`  (
   `delete` tinyint(1) NOT NULL COMMENT '是否删除',
   `createTime` datetime(6) NOT NULL ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   PRIMARY KEY (`addressid`) USING BTREE,
-  INDEX `auserid`(`userid`) USING BTREE,
-  CONSTRAINT `auserid` FOREIGN KEY (`userid`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户地址表\n' ROW_FORMAT = Dynamic;
+  INDEX `addressuserid`(`user_id`) USING BTREE,
+  CONSTRAINT `addressuserid` FOREIGN KEY (`user_id`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户地址表\r\n' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for adinfo
@@ -54,6 +68,7 @@ CREATE TABLE `adinfo`  (
   `isshow` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否显示（删除）',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `adinfo_shopid`(`shopid`) USING BTREE,
+  INDEX `adid`(`adid`) USING BTREE,
   CONSTRAINT `adinfo_shopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '广告信息' ROW_FORMAT = Dynamic;
 
@@ -139,6 +154,36 @@ CREATE TABLE `coupon`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for coupon_shop
+-- ----------------------------
+DROP TABLE IF EXISTS `coupon_shop`;
+CREATE TABLE `coupon_shop`  (
+  `id` bigint(20) NOT NULL,
+  `coupon_id` bigint(20) NOT NULL COMMENT '外键: 优惠券id',
+  `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键：对应商品id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `couponshopcid`(`coupon_id`) USING BTREE,
+  INDEX `couponshopsid`(`shop_id`) USING BTREE,
+  CONSTRAINT `couponshopcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `couponshopsid` FOREIGN KEY (`shop_id`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for coupon_sort
+-- ----------------------------
+DROP TABLE IF EXISTS `coupon_sort`;
+CREATE TABLE `coupon_sort`  (
+  `id` bigint(20) NOT NULL,
+  `coupon_id` bigint(20) NOT NULL COMMENT '外键：优惠券id',
+  `sort_id` int(11) NOT NULL COMMENT '外键：分类id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `couponsortcid`(`coupon_id`) USING BTREE,
+  INDEX `couponsortsid`(`sort_id`) USING BTREE,
+  CONSTRAINT `couponsortcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `couponsortsid` FOREIGN KEY (`sort_id`) REFERENCES `sortinfo` (`sortid`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for express
 -- ----------------------------
 DROP TABLE IF EXISTS `express`;
@@ -196,8 +241,8 @@ CREATE TABLE `orderinfo`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `payinfo`;
 CREATE TABLE `payinfo`  (
-  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '用户id，外键',
   `pay_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '支付单id',
+  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '用户id，外键',
   `count` decimal(8, 2) NOT NULL COMMENT '金额',
   `pay_method` int(11) NOT NULL COMMENT '支付方式',
   `pay_card` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '支付卡号',
@@ -252,7 +297,7 @@ CREATE TABLE `searchrecord`  (
   `content` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '搜索记录信息',
   `time` datetime(6) NOT NULL COMMENT '搜索时间',
   `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '外键 用户id',
-  `id_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '搜索IP地址',
+  `ip_address` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '搜索IP地址',
   `isshow` tinyint(1) NOT NULL COMMENT '是否显示 0不显示 1显示',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
@@ -298,8 +343,10 @@ CREATE TABLE `shopimg`  (
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
   `path` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '图片路径',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
-  PRIMARY KEY (`imgid`) USING BTREE
-) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`imgid`) USING BTREE,
+  INDEX `shopimgid`(`shopid`) USING BTREE,
+  CONSTRAINT `shopimgid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shopimg
@@ -344,16 +391,16 @@ DROP TABLE IF EXISTS `sortinfo`;
 CREATE TABLE `sortinfo`  (
   `sortid` int(11) NOT NULL AUTO_INCREMENT COMMENT '分类id',
   `sortname` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类名',
+  `sortename` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类英文名，必须为大写',
   `isshow` tinyint(1) NOT NULL COMMENT '是否显示',
   `createTime` datetime(6) NOT NULL COMMENT '添加时间',
-  `sortename` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类英文名，必须为大写',
   PRIMARY KEY (`sortid`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '商品分类表\r\n' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sortinfo
 -- ----------------------------
-INSERT INTO `sortinfo` VALUES (1, '手机', 1, '2020-01-02 21:49:46.717000', 'PHONE');
+INSERT INTO `sortinfo` VALUES (1, '手机', 'PHONE', 1, '2020-01-02 21:49:46.717000');
 
 -- ----------------------------
 -- Table structure for user_pay
@@ -379,13 +426,19 @@ DROP TABLE IF EXISTS `usercoupon`;
 CREATE TABLE `usercoupon`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `coupon_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '外键:优惠券id',
-  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '外键:用户id',
+  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:用户id',
   `get_type` tinyint(1) NOT NULL COMMENT '获取类型：0->后台赠送；1->主动获取',
   `createTime` datetime(6) NOT NULL COMMENT '获取时间',
   `use_status` tinyint(1) NOT NULL COMMENT '使用状态: 0->未使用 1-> 已使用  2-> 已过期',
   `use_time` datetime(6) NULL DEFAULT NULL COMMENT '使用时间',
-  `order_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '外键:订单id',
-  PRIMARY KEY (`id`) USING BTREE
+  `order_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:订单id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `couponcid`(`coupon_id`) USING BTREE,
+  INDEX `couserid`(`user_id`) USING BTREE,
+  INDEX `couponorderid`(`order_id`) USING BTREE,
+  CONSTRAINT `couponcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`coupon_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `couserid` FOREIGN KEY (`user_id`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `couponorderid` FOREIGN KEY (`order_id`) REFERENCES `orderinfo` (`order_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -393,7 +446,7 @@ CREATE TABLE `usercoupon`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `userinfo`;
 CREATE TABLE `userinfo`  (
-  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '1000' COMMENT '用户id，唯一，规则时间戳+random',
+  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '用户id，唯一，规则时间戳+random',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '用户昵称',
   `sex` tinyint(1) NULL DEFAULT 1 COMMENT '用户性别，默认为男，用数字1，2代替',
   `id` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '国内身份证，实名制标记',
@@ -408,7 +461,8 @@ CREATE TABLE `userinfo`  (
   `isname` tinyint(1) NULL DEFAULT 2 COMMENT '是否实名制',
   `nametime` datetime(6) NULL DEFAULT NULL COMMENT '实名制时间',
   PRIMARY KEY (`user_id`) USING BTREE,
-  INDEX `phone`(`phone`) USING BTREE
+  INDEX `phone`(`phone`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户信息' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
