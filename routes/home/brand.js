@@ -4,6 +4,9 @@ const app = express();
 const token = require('../../util/token')
 const tokens = new token()
 const uuid = require('node-uuid')
+const img = require('../../util/img')
+const imgutil = new img()
+const time = require('../../util/time')
 
 // 获取全部品牌
 app.use('/GETBRAND', (req, res, next) => {
@@ -24,12 +27,44 @@ app.use('/GETBRAND', (req, res, next) => {
         })
 })
 
+app.use('/GETBRANDS',(req,res,next)=>{
+  let {brandname, isfix, page, pageSize} = req.body
+  let i ={
+      0: '1',
+      undefined: '1',
+      1: `isfix = '1'`,
+      2: `isfix = '0'`,
+  }[isfix]
+  let start = (page-1)*pageSize
+  let sql = brandname == ''? `select * from brandinfo where ${i} limit ${start},${pageSize*page}; ` : `select * from brandinfo where ${i} and brandname like '%${brandname}%' or brandename like '%${brandname}%' limit ${start},${pageSize*page}`
+  let sq = brandname == ''? `select count(*) as count from brandinfo where ${i}; ` : `select count(*) as count from brandinfo where ${i} and brandname like '%${brandname}%' or brandename like '%${brandname}%'`
+  mysql(sql)
+    .then(da=>{
+        mysql(sq).then(data=>{
+          res.json({
+            code:200,
+            count: JSON.parse(JSON.stringify(data))[0].count,
+            info: da
+        })
+        })
+    })
+  .catch(err=>{
+      res.json({
+          code: 600,
+          message: err
+      })
+  })
+})
+
 // 根据Id获取品牌信息
 app.use('/GETBRANDBYID', (req,res,next)=>{
     let {brandid} = req.body
     let sql = `select * from brandinfo where brandid = ${brandid}`
     mysql(sql)
         .then(data => {
+            data = JSON.parse(JSON.stringify(data))[0]
+            console.log(data);
+            data.brandimg= data.brandimg==''? '': imgutil.imgtobase(`./public${data.brandimg}`)
             res.json({
                 code: 200,
                 status: true,
@@ -63,12 +98,14 @@ app.use('/GETFIXBRAND', (req, res, next) => {
 })
 // 添加品牌
 app.use('/ADDBRAND',(req,res,next)=>{
-    let { brandname, brandename, brandimg, isfix, phone } = req.body
+    let { brandname, brandename, brandimg, isfix} = req.body
         let _t_ = req.headers.authorization
-        let imgs = imgutil.saveImg(brandimg)
-        let t = tokens.checkToken(phone, _t_)
+        let imgs = imgutil.saveImg('/brand/',brandimg)
+        let roleid = req.headers.roleid
+        let phone = req.headers.phone
+        let t = tokens.checkAdminToken(phone, _t_,roleid)
         t.then(data => {
-                let sql = `insert into brandinfo(id,brandname,brandename,brangimg,isfix) values(${uuid.v1()},${brandname},${brandename},${imgs},${isfix})`
+                let sql = `insert into brandinfo(brandid,brandname,brandename,brandimg,isfix) values('${uuid.v1()}','${brandname}','${brandename}','${imgs}','${isfix}')`
                 mysql(sql).then(data => {
                         res.json({
                             code: 200,
@@ -84,7 +121,7 @@ app.use('/ADDBRAND',(req,res,next)=>{
             })
             .catch(err => {
                 res.json({
-                    code: 600,
+                    code: 601,
                     message: '你没有权限' + err
                 })
             })
@@ -92,13 +129,15 @@ app.use('/ADDBRAND',(req,res,next)=>{
 
 // 修改品牌
 app.use('/UPDATEBRAND',(req,res,next)=>{
-    let { brandid, brandname, brandename, brandimg, isfix, phone } = req.body
+    let { brandid, brandname, brandename, brandimg, isfix } = req.body
     let _t_ = req.headers.authorization
-    let imgs = imgutil.saveImg(brandimg)
-    let t = tokens.checkToken(phone, _t_)
+    let imgs = imgutil.saveImg('/brand/',brandimg)
+    let roleid = req.headers.roleid
+    let phone = req.headers.phone
+let t = tokens.checkAdminToken(phone, _t_,roleid)
     const ct = time.getTime()
         t.then(data => {
-                let sql = `update brandinfo set brandname = ${brandname}, brandename = ${brandename}, brandimg = ${brandimg} , isfix = ${isfix} where brandid = ${brandid}`
+                let sql = `update brandinfo set brandname = '${brandname}', brandename = '${brandename}', brandimg = '${imgs}' , isfix = '${isfix}' where brandid = '${brandid}'`
                 mysql(sql).then(data => {
                         res.json({
                             code: 200,
@@ -114,18 +153,20 @@ app.use('/UPDATEBRAND',(req,res,next)=>{
             })
             .catch(err => {
                 res.json({
-                    code: 600,
+                    code: 601,
                     message: '你没有权限' + err
                 })
             })    
 })
 
-app.use('/DELETEAD', (req, res, next) => {
-    let { brandid,phone } = req.body
+app.use('/DELETEBRAND', (req, res, next) => {
+    let { brandid } = req.body
     let _t_ = req.headers.authorization
-    let t = tokens.checkToken(phone, _t_)
+    let roleid = req.headers.roleid
+    let phone =req.headers.phone
+    let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
-            let sql = `update adinfo set isshow = ${0} where id = ${id}`
+            let sql = `delete from brandinfo where brandid = '${brandid}'`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -141,7 +182,7 @@ app.use('/DELETEAD', (req, res, next) => {
         })
         .catch(err => {
             res.json({
-                code: 600,
+                code: 601,
                 message: '你没有权限' + err
             })
         })

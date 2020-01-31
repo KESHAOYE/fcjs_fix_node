@@ -23,8 +23,8 @@ class Time {
         return Math.floor(new Date().getTime() / 1000) / 1000 + n * 60
     }
     // 获取当前时间 YYYY-MM-DD HH:MM:SS
-    getTime() {
-        var date = new Date();
+    getTime(date) {
+        date = date == undefined ? new Date :new Date(date);
 
         var year = date.getFullYear();
         var month = date.getMonth();
@@ -47,10 +47,11 @@ class Time {
         return `${year}-${month+1}-${day} ${hour}:${minute}:${second}`
     }
     // 获取当前时间 YYYY年MM月DD日 HH时MM分SS秒
-    getCTime() {
+    getCTime(date) {
+        date = date == undefined ? new Date :new Date(date);
         var year = date.getFullYear();
         var month = date.getMonth();
-        var day = date.getDate();
+        var day = date.getDate()+1;
 
         var hour = date.getHours();
         var minute = date.getMinutes();

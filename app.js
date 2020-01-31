@@ -5,19 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const fs = require('fs')
 var FileStreamRotator = require('file-stream-rotator');
-const time = require('./util/time')
+var bodyParser = require('body-parser');
 
-const http = require('http')
-    //引入socket服务
-const chat = require('./util/chat')
-    //引入 token服务
-const token = require('./util/token')
-    //引入图片验证码库
-const validator = require('./util/imgvalidator')
 
-// new validator(250,150).getData('15359639480')
-// new validator(250,150).checkData('15359639480')
-// chat();
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
 // var adapiRouter = require("./routes/ad/adapi");
@@ -25,7 +15,8 @@ var fixmodelRouter = require('./routes/home/fixmodel')
 var sortRouter = require('./routes/home/sort')
 
 var app = express();
-
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -63,6 +54,14 @@ let order = require('./routes/user/order')
 app.use('/order', order)
 let ad = require('./routes/ad/adapi')
 app.use('/ad', ad)
+let phoneValidator = require('./routes/user/phoneValidator')
+app.use('/phoneValidator', phoneValidator)
+let adminlogin = require('./routes/admin/adminlogin')
+app.use('/adminlogin', adminlogin)
+let spec = require('./routes/shop/spec')
+app.use('/spec', spec)
+let shop = require('./routes/shop/shop')
+app.use('/shop', shop)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

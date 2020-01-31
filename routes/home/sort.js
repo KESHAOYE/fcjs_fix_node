@@ -2,6 +2,8 @@ const express = require("express");
 const mysql = require('../../util/db')
 const app = express();
 const token = require('../../util/token')
+const tokens =new token()
+const time = require('../../util/time')
 
 // 获取分类
 app.use('/GETSORT', (req, res, next) => {
@@ -49,21 +51,63 @@ app.use('/GETSORT', (req, res, next) => {
         })
 })
 
+app.use('/GETSORTS',(req,res,next)=>{
+    let {sortname, page, pageSize} = req.body
+    let start = (page-1)*pageSize
+  let sql = sortname == ''? `select * from sortinfo limit ${start},${pageSize*page}` : `select * from sortinfo where sortname like '%${sortname}%' or sortename like '%${sortname}%' limit ${start},${pageSize*page}`
+  let sq = sortname == ''? `select count(*) as count from sortinfo ` : `select count(*) as count from sortinfo where sortname like '%${sortname}%' or sortename like '%${sortname}%'`
+    mysql(sql)
+    .then(da=>{
+        mysql(sq).then(data=>{
+          res.json({
+            code:200,
+            count: JSON.parse(JSON.stringify(data))[0].count,
+            info: da
+        })
+        })
+    })
+  .catch(err=>{
+      res.json({
+          code: 600,
+          message: err
+      })
+  })
+
+})
+
+app.use('/GETSORTBYID',(req,res,next)=>{
+  let {sortid} = req.body
+  let sql = `select * from sortinfo where sortid = ${sortid}`
+    mysql(sql)
+    .then(da=>{
+          res.json({
+            code:200,
+            info: da
+        })
+    })
+  .catch(err=>{
+      res.json({
+          code: 600,
+          message: err
+      })
+  })
+
+})
 //添加分类
 
 app.use('/ADDSORT', (req, res, next) => {
     let {
         sortname,
         sortename,
-        userType,
-        phone
+        isshow
     } = req.body
     let _t_ = req.headers.authorization
-    let imgs = imgutil.saveImg(adimg)
-    let t = tokens.checkToken(phone, _t_)
+    let roleid = req.headers.roleid
+    let phone = req.headers.phone
+    let t = tokens.checkAdminToken(phone, _t_,roleid)
     const ct = time.getTime()
     t.then(data => {
-            let sql = `insert into sortinfo(sortname,sortename,createTime) values(${sortname},${sortename},${ct})`
+            let sql = `insert into sortinfo(sortname,sortename,isshow,createTime) values('${sortname}','${sortename}','${isshow}','${ct}')`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -79,7 +123,7 @@ app.use('/ADDSORT', (req, res, next) => {
         })
         .catch(err => {
             res.json({
-                code: 600,
+                code: 601,
                 message: '你没有权限' + err
             })
         })
@@ -92,15 +136,14 @@ app.use('/UPDATESORT', (req, res, next) => {
         sortid,
         sortname,
         sortename,
-        userType,
-        phone
+        isshow
     } = req.body
     let _t_ = req.headers.authorization
-    let imgs = imgutil.saveImg(adimg)
-    let t = tokens.checkToken(phone, _t_)
-    const ct = time.getTime()
+    let roleid = req.headers.roleid
+    let phone = req.headers.phone
+    let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
-            let sql = `update sortinfo set sortname= ${sortname},sortename = ${sortename} where sortid = ${sortid}`
+            let sql = `update sortinfo set sortname= '${sortname}',sortename = '${sortename}',isshow = '${isshow}' where sortid = '${sortid}'`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -116,7 +159,7 @@ app.use('/UPDATESORT', (req, res, next) => {
         })
         .catch(err => {
             res.json({
-                code: 600,
+                code: 601,
                 message: '你没有权限' + err
             })
         })
@@ -125,11 +168,13 @@ app.use('/UPDATESORT', (req, res, next) => {
 //删除分类
 
 app.use('/DELETESORT', (req, res, next) => {
-    let { id } = req.body
+    let { sortid } = req.body
     let _t_ = req.headers.authorization
-    let t = tokens.checkToken(phone, _t_)
+    let roleid = req.headers.roleid
+    let phone = req.headers.phone
+    let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
-            let sql = `update sortinfo set isshow = ${0} where id = ${id}`
+            let sql = `update sortinfo set isshow = ${0} where sortid = ${sortid}`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -145,7 +190,7 @@ app.use('/DELETESORT', (req, res, next) => {
         })
         .catch(err => {
             res.json({
-                code: 600,
+                code: 601,
                 message: '你没有权限' + err
             })
         })

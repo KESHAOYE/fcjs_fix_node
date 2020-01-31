@@ -130,17 +130,12 @@ class imgValidator {
         return new Promise(function(resolve, reject) {
             if (Math.round(time - new Date().getTime() / 1000) >= 0) {
                 // 时间通过 验证 X
-                console.log(data, x, time)
                 x = parseInt(x)
-                console.log(x - 15, x + 15)
-                console.log(data > x - 15 || data < x + 15)
                 if (data > x - 15 && data < x + 15) {
                     // x 通过
                     resolve('ok')
-                    console.log('ok');
                 } else {
                     reject('验证出错')
-                    console.log('验证出错');
                 }
             } else {
                 reject('验证超时')

@@ -31,7 +31,8 @@ app.use('/ADDCOUPON', (req, res, next) => {
         let { type, amount, per_limit, min_price, start_time, over_time, use_type, note, public_count, get_date, shop_id, sort_id, phone } = req.body
         let couponid = uuid.v1()
         let _t_ = req.headers.authorization
-        let t = tokens.checkToken(_t_, phone)
+        let roleid = req.headers.roleid
+        let t = tokens.checkAdminToken(phone, _t_,roleid)
         t.then(data => {
             let sql = {
                 // 全场通用
@@ -115,7 +116,8 @@ app.use('/ADDCOUPON', (req, res, next) => {
 app.use('/UPDATECOUPON', (req, res, next) => {
         let { start_time, over_time, per_limit, public_count, id } = req.body
         let _t_ = req.headers.authorization
-        let t = tokens.checkToken(_t_, phone)
+        let roleid = req.headers.roleid
+let t = tokens.checkAdminToken(phone, _t_,roleid)
         t.then(data => {
                 let sql = `update coupon set start_time = ${start_time} , over_time = ${over_time}, per_limit = ${per_limit}, public_count = ${public_count} where id = ${id}`
                 mysql(sql)
@@ -149,7 +151,8 @@ app.use('/UPDATECOUPON', (req, res, next) => {
 app.use('USERGETCOUPON', (req, res, next) => {
     let { id, phone, getType } = req.body
     let _t_ = req.headers.authorization
-    let t = tokens.checkToken(_t_, phone)
+    let roleid = req.headers.roleid
+let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
             let s = `select public_count as pcount,receive_count as rcount from coupon where coupon_id = ${id}`
             let sql = `drop DECLARE PROCEDURE IF EXISTS usergetcoupon
@@ -205,6 +208,36 @@ app.use('USERGETCOUPON', (req, res, next) => {
                 code: 600,
                 status: false,
                 message: '授权失败'
+            })
+        })
+})
+
+// 删除优惠券
+app.use('/DELETECOUPON', (req, res, next) => {
+    let { id, phone } = req.body
+    let _t_ = req.headers.authorization
+    let roleid = req.headers.roleid
+    let t = tokens.checkAdminToken(phone, _t_,roleid)
+    t.then(data => {
+            let sql = `update coupon set isshow = '1' where coupon_id = ${id}`
+            mysql(sql)
+                .then(data => {
+                    res.json({
+                        code: 200,
+                        message: '删除成功'
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: `删除失败${err}`
+                    })
+                })
+        })
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: '您没有权限'
             })
         })
 })

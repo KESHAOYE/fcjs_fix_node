@@ -8,7 +8,7 @@ class img {
      * 判断是否是图片
      */
     isImg(string) {
-        let reg = new RegExp(/^data:image\/\w+;base64,/);
+        let reg = new RegExp(/^data:image\/\w+;base64,/g);
         return reg.test(string);
     }
 
@@ -19,14 +19,19 @@ class img {
     basetoimg(string) {
         var base64Data = string.replace(/^data:image\/\w+;base64,/, "");
         var dataBuffer = new Buffer(base64Data, 'base64');
+        console.log(dataBuffer)
         return dataBuffer
     }
     imgtobase(path) {
+        if(fs.existsSync(path)){
             let file = fs.readFileSync(path)
             let base64str = Buffer.from(file, 'binary').toString('base64'); // base64编码
             base64str = "data:" + type.lookup(path) + ";base64," + base64str
             return base64str;
+        }else{
+            return null;
         }
+    }
         /**
          * 生成文件名 并 查询是否重名
          * @param{*} filename 文件名
@@ -50,6 +55,7 @@ class img {
      * 将图片保存到路径中
      */
     saveImg(path, string) {
+        path = `./public${path}`
         let el = this.checkexist(path)
         if (this.isImg(string)) {
             fs.writeFile(path + el, this.basetoimg(string), (err) => {

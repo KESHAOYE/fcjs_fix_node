@@ -1,7 +1,7 @@
 /*
  Navicat MySQL Data Transfer
 
- Source Server         : 123
+ Source Server         : KESHAOYE
  Source Server Type    : MySQL
  Source Server Version : 50726
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 22/01/2020 14:32:23
+ Date: 31/01/2020 11:25:38
 */
 
 SET NAMES utf8mb4;
@@ -58,24 +58,18 @@ CREATE TABLE `adinfo`  (
   `id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '广告id',
   `adid` int(11) NOT NULL COMMENT '对应广告位',
   `adimg` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '广告图',
-  `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-对应商品id',
+  `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '外键-对应商品id',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
   `startdue` date NOT NULL COMMENT '开始时间',
   `overdue` date NOT NULL COMMENT '过期时间',
   `create_man` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-对应员工号，添加人',
-  `clickcount` int(11) NOT NULL DEFAULT 0 COMMENT '点击次数',
-  `priority` int(11) NOT NULL COMMENT '优先级-1为最高',
   `isshow` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否显示（删除）',
+  `res` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `adinfo_shopid`(`shopid`) USING BTREE,
   INDEX `adid`(`adid`) USING BTREE,
   CONSTRAINT `adinfo_shopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '广告信息' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of adinfo
--- ----------------------------
-INSERT INTO `adinfo` VALUES ('1', 1, 'test', '12', '2020-01-21 13:51:47.000000', '2020-01-03', '2020-01-20', '12', 0, 1, 1);
 
 -- ----------------------------
 -- Table structure for article_info
@@ -106,7 +100,14 @@ CREATE TABLE `brandinfo`  (
 -- ----------------------------
 -- Records of brandinfo
 -- ----------------------------
-INSERT INTO `brandinfo` VALUES ('1', '小米', 'xiaomi', '', 1);
+INSERT INTO `brandinfo` VALUES ('1', '小米', 'xiaomi', '/brand/20201320423962031.png', 1);
+INSERT INTO `brandinfo` VALUES ('82885450-4362-11ea-9f28-0121c959f5e1', '苹果', 'APPLE', '/brand/20201521145640377.png', 1);
+INSERT INTO `brandinfo` VALUES ('9246c930-4362-11ea-9f28-0121c959f5e1', '华为', 'HUAWEI', '/brand/20201521152281778.png', 1);
+INSERT INTO `brandinfo` VALUES ('99f92740-4362-11ea-9f28-0121c959f5e1', '魅族', 'MEIZU', '/brand/20201521153573176.png', 1);
+INSERT INTO `brandinfo` VALUES ('a397c4f0-4362-11ea-9f28-0121c959f5e1', '一加', 'ONEPLUS', '/brand/20201521155187065.png', 1);
+INSERT INTO `brandinfo` VALUES ('ad8015d0-4362-11ea-9f28-0121c959f5e1', '欧珀', 'OPPO', '/brand/2020152116849225.png', 1);
+INSERT INTO `brandinfo` VALUES ('af6bead0-4363-11ea-a2ce-ad6eaf55d11d', '三星', 'SAMSUNG', '/brand/20201521232120360.png', 1);
+INSERT INTO `brandinfo` VALUES ('b9460ae0-4363-11ea-a2ce-ad6eaf55d11d', '维沃', 'VIVO', '/brand/20201521233774195.png', 1);
 
 -- ----------------------------
 -- Table structure for comment_info
@@ -115,7 +116,7 @@ DROP TABLE IF EXISTS `comment_info`;
 CREATE TABLE `comment_info`  (
   `commentid` int(11) NOT NULL AUTO_INCREMENT COMMENT '评论id',
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
-  `specsid` int(11) NOT NULL COMMENT '外键-规格id',
+  `specsid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-规格id',
   `comment` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '评论内容',
   `userid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-用户id',
   `comment_time` datetime(6) NOT NULL COMMENT '评论时间',
@@ -127,7 +128,6 @@ CREATE TABLE `comment_info`  (
   INDEX `specid`(`specsid`) USING BTREE,
   INDEX `userid`(`userid`) USING BTREE,
   CONSTRAINT `cshopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `specid` FOREIGN KEY (`specsid`) REFERENCES `shop_specs` (`specs_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `userid` FOREIGN KEY (`userid`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '评论商品表' ROW_FORMAT = Dynamic;
 
@@ -147,18 +147,25 @@ CREATE TABLE `coupon`  (
   `use_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '使用类型：0->全场通用；1->指定分类；2->指定商品',
   `note` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '备注',
   `public_count` int(11) NOT NULL COMMENT '发行数量',
-  `receive_count` int(11) NOT NULL COMMENT '领取数量',
+  `receive_count` int(11) NOT NULL DEFAULT 0 COMMENT '领取数量',
   `get_date` datetime(6) NOT NULL COMMENT '截至领取时间',
+  `isshow` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `coupon_id`(`coupon_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of coupon
+-- ----------------------------
+INSERT INTO `coupon` VALUES (6, '1', 0, 100.00, 1, 101.00, '2020-01-23 00:00:00.000000', '2020-01-31 00:00:00.000000', '1', '测试优惠券', 100, 0, '2020-01-25 00:00:00.000000', 0);
+INSERT INTO `coupon` VALUES (7, '1', 0, 100.00, 1, 101.00, '2020-01-23 00:00:00.000000', '2020-01-31 00:00:00.000000', '1', '测试优惠券', 100, 0, '2020-01-25 00:00:00.000000', 0);
 
 -- ----------------------------
 -- Table structure for coupon_shop
 -- ----------------------------
 DROP TABLE IF EXISTS `coupon_shop`;
 CREATE TABLE `coupon_shop`  (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `coupon_id` bigint(20) NOT NULL COMMENT '外键: 优惠券id',
   `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键：对应商品id',
   PRIMARY KEY (`id`) USING BTREE,
@@ -166,14 +173,14 @@ CREATE TABLE `coupon_shop`  (
   INDEX `couponshopsid`(`shop_id`) USING BTREE,
   CONSTRAINT `couponshopcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `couponshopsid` FOREIGN KEY (`shop_id`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for coupon_sort
 -- ----------------------------
 DROP TABLE IF EXISTS `coupon_sort`;
 CREATE TABLE `coupon_sort`  (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `coupon_id` bigint(20) NOT NULL COMMENT '外键：优惠券id',
   `sort_id` int(11) NOT NULL COMMENT '外键：分类id',
   PRIMARY KEY (`id`) USING BTREE,
@@ -181,7 +188,7 @@ CREATE TABLE `coupon_sort`  (
   INDEX `couponsortsid`(`sort_id`) USING BTREE,
   CONSTRAINT `couponsortcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `couponsortsid` FOREIGN KEY (`sort_id`) REFERENCES `sortinfo` (`sortid`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for express
@@ -213,6 +220,128 @@ CREATE TABLE `fixmodel`  (
   INDEX `fbrandid`(`brandid`) USING BTREE,
   CONSTRAINT `fbrandid` FOREIGN KEY (`brandid`) REFERENCES `brandinfo` (`brandid`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '维修机型' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for menu
+-- ----------------------------
+DROP TABLE IF EXISTS `menu`;
+CREATE TABLE `menu`  (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '菜单名称',
+  `path` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '菜单路径',
+  `icon` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '菜单图标',
+  `parentId` int(11) NULL DEFAULT NULL COMMENT '子项',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `menucid`(`parentId`) USING BTREE,
+  CONSTRAINT `menucid` FOREIGN KEY (`parentId`) REFERENCES `menu` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of menu
+-- ----------------------------
+INSERT INTO `menu` VALUES (1, '首页', '/index', '', NULL);
+INSERT INTO `menu` VALUES (2, '商品管理', '', NULL, NULL);
+INSERT INTO `menu` VALUES (3, '类别属性设置', '/specManage', NULL, 2);
+INSERT INTO `menu` VALUES (4, '库存管理', '/storageManage', NULL, 2);
+INSERT INTO `menu` VALUES (5, '商品管理', '/shopManage', NULL, 2);
+INSERT INTO `menu` VALUES (6, '广告管理', NULL, NULL, NULL);
+INSERT INTO `menu` VALUES (7, '首页广告管理', '/indexAdManage', NULL, 6);
+INSERT INTO `menu` VALUES (8, '商品推荐', '/shopRecomment', NULL, 6);
+INSERT INTO `menu` VALUES (9, '基础运营配置', '/base', NULL, NULL);
+INSERT INTO `menu` VALUES (10, '收款银行/账号设置', '/setBank', NULL, 9);
+INSERT INTO `menu` VALUES (11, '运营人员管理', '/peopleManage', NULL, 9);
+INSERT INTO `menu` VALUES (12, '部门权限设置', '/setAdmin', NULL, 9);
+INSERT INTO `menu` VALUES (13, '品牌管理', '/brandManage', NULL, 9);
+INSERT INTO `menu` VALUES (14, '活动管理', '', NULL, NULL);
+INSERT INTO `menu` VALUES (15, '优惠券管理', '/couponManage', NULL, 14);
+INSERT INTO `menu` VALUES (16, '活动管理', '/activityManage', NULL, 14);
+INSERT INTO `menu` VALUES (17, '类别管理', '/sortManage', NULL, 9);
+INSERT INTO `menu` VALUES (18, '社区(评论)管理', NULL, NULL, NULL);
+INSERT INTO `menu` VALUES (19, '评论管理', '/commentManage', NULL, 18);
+INSERT INTO `menu` VALUES (20, '举报管理', '/reportManage', NULL, 18);
+
+-- ----------------------------
+-- Table structure for menu_user
+-- ----------------------------
+DROP TABLE IF EXISTS `menu_user`;
+CREATE TABLE `menu_user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `roleid` int(11) NOT NULL COMMENT '主/外 键：角色id',
+  `menuid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键：菜单id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 74 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of menu_user
+-- ----------------------------
+INSERT INTO `menu_user` VALUES (1, 1, '1');
+INSERT INTO `menu_user` VALUES (2, 1, '2');
+INSERT INTO `menu_user` VALUES (3, 1, '3');
+INSERT INTO `menu_user` VALUES (4, 1, '4');
+INSERT INTO `menu_user` VALUES (5, 1, '5');
+INSERT INTO `menu_user` VALUES (6, 1, '6');
+INSERT INTO `menu_user` VALUES (7, 1, '7');
+INSERT INTO `menu_user` VALUES (8, 1, '8');
+INSERT INTO `menu_user` VALUES (9, 2, '1');
+INSERT INTO `menu_user` VALUES (10, 2, '2');
+INSERT INTO `menu_user` VALUES (11, 2, '3');
+INSERT INTO `menu_user` VALUES (12, 2, '4');
+INSERT INTO `menu_user` VALUES (13, 2, '5');
+INSERT INTO `menu_user` VALUES (14, 2, '6');
+INSERT INTO `menu_user` VALUES (15, 2, '7');
+INSERT INTO `menu_user` VALUES (16, 2, '8');
+INSERT INTO `menu_user` VALUES (17, 3, '1');
+INSERT INTO `menu_user` VALUES (18, 3, '2');
+INSERT INTO `menu_user` VALUES (19, 3, '3');
+INSERT INTO `menu_user` VALUES (20, 3, '4');
+INSERT INTO `menu_user` VALUES (21, 3, '5');
+INSERT INTO `menu_user` VALUES (22, 3, '6');
+INSERT INTO `menu_user` VALUES (23, 3, '7');
+INSERT INTO `menu_user` VALUES (24, 3, '8');
+INSERT INTO `menu_user` VALUES (25, 4, '1');
+INSERT INTO `menu_user` VALUES (26, 4, '2');
+INSERT INTO `menu_user` VALUES (27, 4, '3');
+INSERT INTO `menu_user` VALUES (28, 4, '4');
+INSERT INTO `menu_user` VALUES (29, 4, '5');
+INSERT INTO `menu_user` VALUES (30, 4, '6');
+INSERT INTO `menu_user` VALUES (31, 4, '7');
+INSERT INTO `menu_user` VALUES (32, 4, '8');
+INSERT INTO `menu_user` VALUES (33, 5, '1');
+INSERT INTO `menu_user` VALUES (34, 5, '2');
+INSERT INTO `menu_user` VALUES (35, 5, '3');
+INSERT INTO `menu_user` VALUES (36, 5, '4');
+INSERT INTO `menu_user` VALUES (37, 5, '5');
+INSERT INTO `menu_user` VALUES (38, 5, '6');
+INSERT INTO `menu_user` VALUES (39, 5, '7');
+INSERT INTO `menu_user` VALUES (40, 5, '8');
+INSERT INTO `menu_user` VALUES (41, 6, '1');
+INSERT INTO `menu_user` VALUES (42, 6, '2');
+INSERT INTO `menu_user` VALUES (43, 6, '3');
+INSERT INTO `menu_user` VALUES (44, 6, '4');
+INSERT INTO `menu_user` VALUES (45, 6, '5');
+INSERT INTO `menu_user` VALUES (46, 6, '6');
+INSERT INTO `menu_user` VALUES (47, 6, '7');
+INSERT INTO `menu_user` VALUES (48, 6, '8');
+INSERT INTO `menu_user` VALUES (69, 7, '16');
+INSERT INTO `menu_user` VALUES (68, 7, '15');
+INSERT INTO `menu_user` VALUES (66, 7, '13');
+INSERT INTO `menu_user` VALUES (67, 7, '14');
+INSERT INTO `menu_user` VALUES (53, 7, '1');
+INSERT INTO `menu_user` VALUES (54, 7, '2');
+INSERT INTO `menu_user` VALUES (55, 7, '17');
+INSERT INTO `menu_user` VALUES (56, 7, '4');
+INSERT INTO `menu_user` VALUES (57, 7, '5');
+INSERT INTO `menu_user` VALUES (58, 7, '6');
+INSERT INTO `menu_user` VALUES (59, 7, '7');
+INSERT INTO `menu_user` VALUES (60, 7, '8');
+INSERT INTO `menu_user` VALUES (61, 7, '9');
+INSERT INTO `menu_user` VALUES (62, 7, '10');
+INSERT INTO `menu_user` VALUES (63, 7, '11');
+INSERT INTO `menu_user` VALUES (64, 7, '12');
+INSERT INTO `menu_user` VALUES (70, 7, '3');
+INSERT INTO `menu_user` VALUES (71, 7, '18');
+INSERT INTO `menu_user` VALUES (72, 7, '19');
+INSERT INTO `menu_user` VALUES (73, 7, '20');
 
 -- ----------------------------
 -- Table structure for orderinfo
@@ -273,20 +402,44 @@ CREATE TABLE `paymlist`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '支付方式信息\n' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for recommend
+-- Table structure for role
 -- ----------------------------
-DROP TABLE IF EXISTS `recommend`;
-CREATE TABLE `recommend`  (
-  `recommentid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '推荐id',
-  `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-绑定的shopid',
-  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
-  `startdue` datetime(6) NOT NULL COMMENT '开始日期',
-  `overdue` datetime(6) NOT NULL COMMENT '结束日期',
-  `createMan` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-员工id',
-  PRIMARY KEY (`recommentid`) USING BTREE,
-  INDEX `recomment_shopid`(`shopid`) USING BTREE,
-  CONSTRAINT `recomment_shopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '发现好货（官方推荐）' ROW_FORMAT = Dynamic;
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `roleid` int(11) NOT NULL COMMENT '0->客户，1->客服人员 , 2->快递仓储部，3->广告部, 4->维修部，5->商品部，6->超级管理员',
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '角色名称',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '角色描述',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of role
+-- ----------------------------
+INSERT INTO `role` VALUES (1, 0, 'USER', '普通用户');
+INSERT INTO `role` VALUES (2, 1, 'CUSTOMER', '客服人员');
+INSERT INTO `role` VALUES (3, 2, 'EXPRESS', '快递仓储人员');
+INSERT INTO `role` VALUES (4, 3, 'AD', '广告部');
+INSERT INTO `role` VALUES (5, 4, 'FIX', '手机维修部');
+INSERT INTO `role` VALUES (6, 5, 'SHOP', '商品部');
+INSERT INTO `role` VALUES (7, 6, 'SUPER', '超级管理员');
+
+-- ----------------------------
+-- Table structure for roleuser
+-- ----------------------------
+DROP TABLE IF EXISTS `roleuser`;
+CREATE TABLE `roleuser`  (
+  `roleid` int(11) NOT NULL COMMENT '外键: 角色id',
+  `userid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 用户id',
+  PRIMARY KEY (`userid`) USING BTREE,
+  INDEX `roleuserroleid`(`roleid`) USING BTREE,
+  CONSTRAINT `roleuserroleid` FOREIGN KEY (`roleid`) REFERENCES `role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of roleuser
+-- ----------------------------
+INSERT INTO `roleuser` VALUES (7, '1580038654');
 
 -- ----------------------------
 -- Table structure for searchrecord
@@ -305,56 +458,124 @@ CREATE TABLE `searchrecord`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '搜索记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for shop_attribute
+-- Table structure for shop_sku_spec
 -- ----------------------------
-DROP TABLE IF EXISTS `shop_attribute`;
-CREATE TABLE `shop_attribute`  (
-  `attributeid` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品属性id',
-  `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
-  `attributename` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '属性名称',
-  `attributecontent` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '属性内容',
-  `isshow` tinyint(1) NOT NULL COMMENT '是否显示',
-  PRIMARY KEY (`attributeid`) USING BTREE,
-  INDEX `ashopid`(`shopid`) USING BTREE,
-  CONSTRAINT `ashopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '商品属性表\n' ROW_FORMAT = Dynamic;
+DROP TABLE IF EXISTS `shop_sku_spec`;
+CREATE TABLE `shop_sku_spec`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sku_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'sku属性id',
+  `price` decimal(10, 2) NOT NULL COMMENT '价格',
+  `stock` int(11) NOT NULL COMMENT '库存',
+  `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:对应商品id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for shop_specs
+-- Records of shop_sku_spec
 -- ----------------------------
-DROP TABLE IF EXISTS `shop_specs`;
-CREATE TABLE `shop_specs`  (
-  `specs_id` int(11) NOT NULL COMMENT '商品规格id',
-  `specs_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品规格名称',
-  `specs_price` decimal(10, 2) NOT NULL COMMENT '规格对应价格',
-  `specs_img` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '规格对应图片',
-  `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
-  PRIMARY KEY (`specs_id`) USING BTREE,
-  INDEX `shopid`(`shopid`) USING BTREE,
-  CONSTRAINT `shopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '商品规格' ROW_FORMAT = Dynamic;
+INSERT INTO `shop_sku_spec` VALUES (1, '16fe3ed1-437f-11ea-a8c9-27ce6b8279d2', 500.00, 0, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2');
+INSERT INTO `shop_sku_spec` VALUES (2, '16fe3ed0-437f-11ea-a8c9-27ce6b8279d2', 300.00, 0, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2');
+
+-- ----------------------------
+-- Table structure for shop_sku_spec_value
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_sku_spec_value`;
+CREATE TABLE `shop_sku_spec_value`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 规格id',
+  `sku_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: skuid',
+  `sku_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'sku值',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of shop_sku_spec_value
+-- ----------------------------
+INSERT INTO `shop_sku_spec_value` VALUES (3, '1', '15f74b90-437e-11ea-9f82-cf8e5a5bbe02', '12', '2020-01-31 00:32:20.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (4, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', '16fe3ed1-437f-11ea-a8c9-27ce6b8279d2', '128G', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (5, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', '16fe3ed0-437f-11ea-a8c9-27ce6b8279d2', '64G', '2020-01-31 00:39:31.000000');
+
+-- ----------------------------
+-- Table structure for shop_spec
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_spec`;
+CREATE TABLE `shop_spec`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品规格id',
+  `spec_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品规格名称',
+  `spec_des` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '描述',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `specs_id`(`spec_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of shop_spec
+-- ----------------------------
+INSERT INTO `shop_spec` VALUES (1, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', '内存', '智能产品适用', '2020-01-31 00:38:01.000000');
+INSERT INTO `shop_spec` VALUES (2, 'e9fca390-437e-11ea-a8c9-27ce6b8279d2', '颜色', '全品类适用', '2020-01-31 00:38:15.000000');
+INSERT INTO `shop_spec` VALUES (3, 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '摄像头数量', '手机，平板适用', '2020-01-31 00:38:34.000000');
+INSERT INTO `shop_spec` VALUES (4, 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '处理器', '智能设备适用', '2020-01-31 00:38:48.000000');
+
+-- ----------------------------
+-- Table structure for shop_spec_value
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_spec_value`;
+CREATE TABLE `shop_spec_value`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 规格id',
+  `spec_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '规格值',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `ssv_id`(`spec_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of shop_spec_value
+-- ----------------------------
+INSERT INTO `shop_spec_value` VALUES (1, 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '后置五摄', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_spec_value` VALUES (2, 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '骁龙730G', '2020-01-31 00:39:31.000000');
+
+-- ----------------------------
+-- Table structure for shop_spu_spec
+-- ----------------------------
+DROP TABLE IF EXISTS `shop_spu_spec`;
+CREATE TABLE `shop_spu_spec`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 商品id',
+  `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 规格id',
+  `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of shop_spu_spec
+-- ----------------------------
+INSERT INTO `shop_spu_spec` VALUES (1, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_spu_spec` VALUES (2, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 00:39:31.000000');
 
 -- ----------------------------
 -- Table structure for shopimg
 -- ----------------------------
 DROP TABLE IF EXISTS `shopimg`;
 CREATE TABLE `shopimg`  (
-  `imgid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品图片id',
+  `imgid` int(11) NOT NULL AUTO_INCREMENT COMMENT '商品图片id',
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
   `path` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '图片路径',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`imgid`) USING BTREE,
   INDEX `shopimgid`(`shopid`) USING BTREE,
   CONSTRAINT `shopimgid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shopimg
 -- ----------------------------
-INSERT INTO `shopimg` VALUES ('1', '12', 'test.png', '2020-01-20 15:18:56.000000');
-INSERT INTO `shopimg` VALUES ('2', '12', 'test1.png', '2020-01-20 16:19:52.000000');
-INSERT INTO `shopimg` VALUES ('3', '13', 't1', '2020-01-20 16:41:42.000000');
-INSERT INTO `shopimg` VALUES ('4', '12', '2', '2020-01-20 16:41:51.000000');
+INSERT INTO `shopimg` VALUES (1, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/202016039313404.png', '2020-01-31 00:39:31.000000');
+INSERT INTO `shopimg` VALUES (2, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393133734.png', '2020-01-31 00:39:31.000000');
+INSERT INTO `shopimg` VALUES (3, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393135590.png', '2020-01-31 00:39:31.000000');
+INSERT INTO `shopimg` VALUES (4, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393135635.png', '2020-01-31 00:39:31.000000');
 
 -- ----------------------------
 -- Table structure for shopinfo
@@ -365,12 +586,12 @@ CREATE TABLE `shopinfo`  (
   `shopname` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品名称',
   `shopdes` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '商品介绍',
   `shopsort` int(11) NOT NULL COMMENT '外键-分类id',
-  `delete` tinyint(1) NOT NULL COMMENT '是否删除',
-  `catName` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类名',
+  `price` decimal(10, 2) NOT NULL COMMENT '最低价格',
   `brandid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-品牌id',
   `createTime` datetime(6) NOT NULL COMMENT '创建日期',
   `isold` tinyint(1) NOT NULL COMMENT '是否为二手',
   `old_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '二手程度',
+  `delete` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否删除',
   PRIMARY KEY (`shop_id`) USING BTREE,
   INDEX `brandid`(`brandid`) USING BTREE,
   INDEX `sortid`(`shopsort`) USING BTREE,
@@ -381,8 +602,7 @@ CREATE TABLE `shopinfo`  (
 -- ----------------------------
 -- Records of shopinfo
 -- ----------------------------
-INSERT INTO `shopinfo` VALUES ('12', '测试手机', '8', 1, 0, '手机', '1', '2020-01-19 21:53:27.000000', 0, '');
-INSERT INTO `shopinfo` VALUES ('13', '测试手机2', '9', 1, 0, '手机', '1', '2020-01-19 22:00:41.000000', 0, NULL);
+INSERT INTO `shopinfo` VALUES ('16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '小米CC9 Pro 1亿像素 五摄四闪 10倍混合光学变焦 5260mAh 屏下指纹 魔法绿镜 8GB+128GB 游戏智能拍照手机', '【只需2799春节好礼带回家！限时白条6期免息，赠1TB小米云空间1年使用权】', 1, 2399.00, '1', '2020-01-31 00:39:31.000000', 0, '', 0);
 
 -- ----------------------------
 -- Table structure for sortinfo
@@ -392,15 +612,16 @@ CREATE TABLE `sortinfo`  (
   `sortid` int(11) NOT NULL AUTO_INCREMENT COMMENT '分类id',
   `sortname` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类名',
   `sortename` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '分类英文名，必须为大写',
-  `isshow` tinyint(1) NOT NULL COMMENT '是否显示',
+  `isshow` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否显示',
   `createTime` datetime(6) NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`sortid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '商品分类表\r\n' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '商品分类表\r\n' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sortinfo
 -- ----------------------------
 INSERT INTO `sortinfo` VALUES (1, '手机', 'PHONE', 1, '2020-01-02 21:49:46.717000');
+INSERT INTO `sortinfo` VALUES (2, '电脑', 'COMPUTER', 1, '2020-01-28 22:35:12.000000');
 
 -- ----------------------------
 -- Table structure for user_pay
@@ -429,16 +650,16 @@ CREATE TABLE `usercoupon`  (
   `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:用户id',
   `get_type` tinyint(1) NOT NULL COMMENT '获取类型：0->后台赠送；1->主动获取',
   `createTime` datetime(6) NOT NULL COMMENT '获取时间',
-  `use_status` tinyint(1) NOT NULL COMMENT '使用状态: 0->未使用 1-> 已使用  2-> 已过期',
+  `use_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '使用状态: 0->未使用 1-> 已使用  2-> 已过期',
   `use_time` datetime(6) NULL DEFAULT NULL COMMENT '使用时间',
-  `order_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:订单id',
+  `order_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT '外键:订单id',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `couponcid`(`coupon_id`) USING BTREE,
   INDEX `couserid`(`user_id`) USING BTREE,
   INDEX `couponorderid`(`order_id`) USING BTREE,
   CONSTRAINT `couponcid` FOREIGN KEY (`coupon_id`) REFERENCES `coupon` (`coupon_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `couserid` FOREIGN KEY (`user_id`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `couponorderid` FOREIGN KEY (`order_id`) REFERENCES `orderinfo` (`order_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `couponorderid` FOREIGN KEY (`order_id`) REFERENCES `orderinfo` (`order_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `couserid` FOREIGN KEY (`user_id`) REFERENCES `userinfo` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -460,9 +681,99 @@ CREATE TABLE `userinfo`  (
   `regisitertime` datetime(6) NOT NULL COMMENT '注册时间',
   `isname` tinyint(1) NULL DEFAULT 2 COMMENT '是否实名制',
   `nametime` datetime(6) NULL DEFAULT NULL COMMENT '实名制时间',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '权限: 0->普通用户 ，1->普通管理员， 2->超级管理员',
   PRIMARY KEY (`user_id`) USING BTREE,
   INDEX `phone`(`phone`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_unicode_ci COMMENT = '用户信息' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of userinfo
+-- ----------------------------
+INSERT INTO `userinfo` VALUES ('111', '1', 1, '1', '1', '1', '2020-01-26 19:31:40.000000', NULL, '1', '1', 0.00, '2020-01-26 19:31:44.000000', 2, NULL, 0);
+INSERT INTO `userinfo` VALUES ('1234', '1', 1, '1', '1', '1', '2020-01-25 19:48:23.000000', '1', '1', '1', 0.00, '2020-01-25 19:48:29.000000', 2, NULL, 0);
+INSERT INTO `userinfo` VALUES ('1580038654', 'ke', 1, NULL, NULL, '18089008889', NULL, NULL, 'e10adc3949ba59abbe56e057f20f883e', NULL, 0.00, '2020-01-26 17:55:42.000000', 2, NULL, 0);
+
+-- ----------------------------
+-- Procedure structure for couponshop
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `couponshop`;
+delimiter ;;
+CREATE PROCEDURE `couponshop`(IN coupon_id VARCHAR(255),
+ IN type TINYINT(1),
+ IN amount DECIMAL(10,2),
+ IN per_limit INT(11),
+ IN min_price DECIMAL(10,2),
+ IN start_time DATETIME(6),
+ IN over_time DATETIME(6),
+ IN use_type VARCHAR(255),
+ IN note VARCHAR(255),
+ IN public_count INT(11),
+ IN get_date DATETIME(6),
+ IN shop_id VARCHAR(255))
+begin
+DECLARE coupon_temp_id int;
+insert into coupon(coupon_id,type,amount,per_limit,min_price,start_time,over_time,use_type,note,public_count,get_date) values(coupon_id,type,amount,per_limit,min_price,start_time,over_time,use_type,note,public_count,get_date);
+SELECT MAX(id) from coupon INTO coupon_temp_id;
+insert into coupon_shop(coupon_id,shop_id) VALUES(coupon_temp_id,shop_id);END
+;;
+delimiter ;
+
+-- ----------------------------
+-- Procedure structure for couponsort
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `couponsort`;
+delimiter ;;
+CREATE PROCEDURE `couponsort`(IN coupon_id VARCHAR(255),
+ IN type TINYINT(1),
+ IN amount DECIMAL(10,2),
+ IN per_limit INT(11),
+ IN min_price DECIMAL(10,2),
+ IN start_time DATETIME(6),
+ IN over_time DATETIME(6),
+ IN use_type VARCHAR(255),
+ IN note VARCHAR(255),
+ IN public_count INT(11),
+ IN get_date DATETIME(6),
+ IN sort_id INT(11))
+begin
+DECLARE coupon_temp_id int;
+insert into coupon(coupon_id,type,amount,per_limit,min_price,start_time,over_time,use_type,note,public_count,get_date) values(coupon_id,type,amount,per_limit,min_price,start_time,over_time,use_type,note,public_count,get_date);
+SELECT MAX(id) from coupon INTO coupon_temp_id;
+insert into coupon_sort(coupon_id,sort_id) VALUES(coupon_temp_id,sort_id);END
+;;
+delimiter ;
+
+-- ----------------------------
+-- Procedure structure for insertrole
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `insertrole`;
+delimiter ;;
+CREATE PROCEDURE `insertrole`()
+BEGIN
+DECLARE i INT DEFAULT 1;
+WHILE i <= 12 DO
+INSERT INTO menu_user(menuid,roleid) VALUES(i, 7);
+SET i = i+1;
+END WHILE;
+END
+;;
+delimiter ;
+
+-- ----------------------------
+-- Procedure structure for roleinfo
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `roleinfo`;
+delimiter ;;
+CREATE PROCEDURE `roleinfo`()
+BEGIN
+    DECLARE rid INT(11);
+    DECLARE userid varchar(255);
+    SELECT user_id INTO userid from userinfo where phone = '18089008889';
+    SELECT roleid INTO rid FROM roleuser where userid = userid;
+    SELECT * FROM role where id = rid;
+    END
+;;
+delimiter ;
 
 SET FOREIGN_KEY_CHECKS = 1;

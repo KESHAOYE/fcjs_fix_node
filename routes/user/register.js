@@ -75,7 +75,10 @@ app.use('/REGISTERNEW', async(req, res, next) => {
         })
     } else {
         //插入语句
-        let sql = `insert into userinfo(user_id,username,phone,password,regisitertime) values('${userId}','${name}','${phone}','${passwords}','${regisiterTime}');`
+        let sql = `
+        insert into userinfo(user_id,username,phone,password,regisitertime) values('${userId}','${name}','${phone}','${passwords}','${regisiterTime}');
+        insert into roleuser(userid,roleid) values('${userId}', '${1}');
+        `
         mysql(sql)
             .then(data => {
                 res.json({

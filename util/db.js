@@ -8,7 +8,8 @@ let pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'LKW54321likewei.',
-    database: 'fcjs_fix'
+    database: 'fcjs_fix',
+    multipleStatements: true
 })
 pool.getConnection((err)=>{
   if(err) {
@@ -19,6 +20,7 @@ pool.getConnection((err)=>{
 })
 let query = function(sql, values) {
     // 返回一个 Promise
+    console.log(sql)
     return new Promise((resolve, reject) => {
         pool.getConnection(function(err, connection) {
             if (err) {

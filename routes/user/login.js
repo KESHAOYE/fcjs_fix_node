@@ -4,10 +4,12 @@ const token = require('../../util/token')
 var utility = require("utility");
 const time = require('../../util/time')
 let tokens = new token()
+const regs = require('../../util/reg')
+const reg = new regs()
 let app = express()
 
 async function existUser(phone) {
-    let sql = `select count(1) as count from userinfo where phone = ${phone}`
+    let sql = `select count(1) as count from userinfo where phone = '${phone}'`
     let query = await mysql(sql)
     if (query[0].count > 0) {
         return Promise.resolve(403)
@@ -17,7 +19,7 @@ async function existUser(phone) {
 }
 
 async function existId(id) {
-    let sql = `select count(1) as count from userinfo where user_id = ${id}`
+    let sql = `select count(1) as count from userinfo where user_id = '${id}'`
     let query = await mysql(sql)
     if (query[0].count > 0) {
         return Promise.resolve(403)
@@ -38,7 +40,6 @@ app.use('/LOGINAUTO', async(req, res, next) => {
                 })
             })
             .catch(err => {
-                console.log(err)
                 res.json({
                     code: 600,
                     message: err
@@ -51,6 +52,32 @@ app.use('/LOGINU', async(req, res, next) => {
         phone,
         password
     } = req.body
+    await reg.checkphonenumber(phone, (data) => {
+        return new Promise((resolve,reject)=>{
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            resolve('exit')
+            next('router')
+        }
+        resolve()
+      })
+    })
+    await reg.checkpassword(password, (data) => {
+        return new Promise((resolve,reject)=>{
+            if (data) {
+                res.json({
+                    code: 600,
+                    message: data
+                })
+                resolve('exit')
+                next('router')
+            }
+            resolve()
+          })
+    })
     let passwords = utility.md5(password)
     let code = await existUser(phone)
     if (code === 200) {
@@ -90,7 +117,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
     let { id, phone } = req.body
     let code = id ? await existId(id) : await existUser(phone)
     if (code === 403) {
-        let sql = id ? `select * from userinfo where user_id = '${id}'` : `select * from userinfo where phone = '${phone}'`
+        let sql = id ? `select * from userinfo where user_id = '${id}';` : `select * from userinfo where phone = '${phone}'`
         mysql(sql)
             .then(data => {
                 let d = data[0]
