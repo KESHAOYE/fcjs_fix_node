@@ -49,7 +49,6 @@ app.use('/ADDAD', (req, res, next) => {
     let phone = req.headers.phone
     let t = tokens.checkAdminToken(phone, _t_,roleid)
     const ct = time.getTime()
-    console.log(shopid);
     t.then(data => {
             let sql = shopid == '' ? `insert into adinfo(id,adid,adimg,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')` : `insert into adinfo(id,adid,adimg,shopid,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}',${shopid},'${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')`
             mysql(sql).then(data => {

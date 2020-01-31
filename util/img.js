@@ -19,7 +19,6 @@ class img {
     basetoimg(string) {
         var base64Data = string.replace(/^data:image\/\w+;base64,/, "");
         var dataBuffer = new Buffer(base64Data, 'base64');
-        console.log(dataBuffer)
         return dataBuffer
     }
     imgtobase(path) {

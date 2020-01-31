@@ -62,6 +62,8 @@ let spec = require('./routes/shop/spec')
 app.use('/spec', spec)
 let shop = require('./routes/shop/shop')
 app.use('/shop', shop)
+let stock = require('./routes/shop/stock')
+app.use('/stock',stock)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

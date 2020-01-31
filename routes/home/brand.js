@@ -63,7 +63,6 @@ app.use('/GETBRANDBYID', (req,res,next)=>{
     mysql(sql)
         .then(data => {
             data = JSON.parse(JSON.stringify(data))[0]
-            console.log(data);
             data.brandimg= data.brandimg==''? '': imgutil.imgtobase(`./public${data.brandimg}`)
             res.json({
                 code: 200,

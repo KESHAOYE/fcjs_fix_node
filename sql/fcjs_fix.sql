@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 31/01/2020 11:25:38
+ Date: 01/02/2020 01:20:18
 */
 
 SET NAMES utf8mb4;
@@ -78,11 +78,17 @@ DROP TABLE IF EXISTS `article_info`;
 CREATE TABLE `article_info`  (
   `aticleId` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键-详情id',
   `shopid` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键-商品id',
-  `aticle_content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `article_content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`aticleId`) USING BTREE,
   INDEX `articleshopid`(`shopid`) USING BTREE,
   CONSTRAINT `articleshopid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of article_info
+-- ----------------------------
+INSERT INTO `article_info` VALUES (1, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', '<p>test</p>');
+INSERT INTO `article_info` VALUES (2, 'beb75e10-441d-11ea-bfbd-812f243dd1f9', '');
 
 -- ----------------------------
 -- Table structure for brandinfo
@@ -100,7 +106,7 @@ CREATE TABLE `brandinfo`  (
 -- ----------------------------
 -- Records of brandinfo
 -- ----------------------------
-INSERT INTO `brandinfo` VALUES ('1', '小米', 'xiaomi', '/brand/20201320423962031.png', 1);
+INSERT INTO `brandinfo` VALUES ('1', '小米', 'xiaomi', '/brand/20201620524488626.png', 1);
 INSERT INTO `brandinfo` VALUES ('82885450-4362-11ea-9f28-0121c959f5e1', '苹果', 'APPLE', '/brand/20201521145640377.png', 1);
 INSERT INTO `brandinfo` VALUES ('9246c930-4362-11ea-9f28-0121c959f5e1', '华为', 'HUAWEI', '/brand/20201521152281778.png', 1);
 INSERT INTO `brandinfo` VALUES ('99f92740-4362-11ea-9f28-0121c959f5e1', '魅族', 'MEIZU', '/brand/20201521153573176.png', 1);
@@ -247,7 +253,7 @@ INSERT INTO `menu` VALUES (5, '商品管理', '/shopManage', NULL, 2);
 INSERT INTO `menu` VALUES (6, '广告管理', NULL, NULL, NULL);
 INSERT INTO `menu` VALUES (7, '首页广告管理', '/indexAdManage', NULL, 6);
 INSERT INTO `menu` VALUES (8, '商品推荐', '/shopRecomment', NULL, 6);
-INSERT INTO `menu` VALUES (9, '基础运营配置', '/base', NULL, NULL);
+INSERT INTO `menu` VALUES (9, '基础运营配置', '', NULL, NULL);
 INSERT INTO `menu` VALUES (10, '收款银行/账号设置', '/setBank', NULL, 9);
 INSERT INTO `menu` VALUES (11, '运营人员管理', '/peopleManage', NULL, 9);
 INSERT INTO `menu` VALUES (12, '部门权限设置', '/setAdmin', NULL, 9);
@@ -468,13 +474,15 @@ CREATE TABLE `shop_sku_spec`  (
   `stock` int(11) NOT NULL COMMENT '库存',
   `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键:对应商品id',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shop_sku_spec
 -- ----------------------------
-INSERT INTO `shop_sku_spec` VALUES (1, '16fe3ed1-437f-11ea-a8c9-27ce6b8279d2', 500.00, 0, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2');
-INSERT INTO `shop_sku_spec` VALUES (2, '16fe3ed0-437f-11ea-a8c9-27ce6b8279d2', 300.00, 0, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2');
+INSERT INTO `shop_sku_spec` VALUES (1, 'e3ff0e40-442a-11ea-aabe-35c76079655b', 300.00, 0, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_sku_spec` VALUES (2, 'e3ff0e41-442a-11ea-aabe-35c76079655b', 400.00, 0, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_sku_spec` VALUES (3, 'e3ff5c60-442a-11ea-aabe-35c76079655b', 0.00, 0, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_sku_spec` VALUES (4, 'e3ff8370-442a-11ea-aabe-35c76079655b', 0.00, 0, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9');
 
 -- ----------------------------
 -- Table structure for shop_sku_spec_value
@@ -487,14 +495,15 @@ CREATE TABLE `shop_sku_spec_value`  (
   `sku_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'sku值',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shop_sku_spec_value
 -- ----------------------------
-INSERT INTO `shop_sku_spec_value` VALUES (3, '1', '15f74b90-437e-11ea-9f82-cf8e5a5bbe02', '12', '2020-01-31 00:32:20.000000');
-INSERT INTO `shop_sku_spec_value` VALUES (4, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', '16fe3ed1-437f-11ea-a8c9-27ce6b8279d2', '128G', '2020-01-31 00:39:31.000000');
-INSERT INTO `shop_sku_spec_value` VALUES (5, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', '16fe3ed0-437f-11ea-a8c9-27ce6b8279d2', '64G', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (1, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', 'e3ff0e40-442a-11ea-aabe-35c76079655b', '64G', '2020-01-31 21:09:19.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (2, 'e19a7d80-437e-11ea-a8c9-27ce6b8279d2', 'e3ff0e41-442a-11ea-aabe-35c76079655b', '128G', '2020-01-31 21:09:19.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (3, 'e9fca390-437e-11ea-a8c9-27ce6b8279d2', 'e3ff5c60-442a-11ea-aabe-35c76079655b', '黑色', '2020-01-31 21:09:19.000000');
+INSERT INTO `shop_sku_spec_value` VALUES (4, 'e9fca390-437e-11ea-a8c9-27ce6b8279d2', 'e3ff8370-442a-11ea-aabe-35c76079655b', '白色', '2020-01-31 21:09:19.000000');
 
 -- ----------------------------
 -- Table structure for shop_spec
@@ -527,15 +536,16 @@ CREATE TABLE `shop_spec_value`  (
   `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 规格id',
   `spec_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '规格值',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  `spu_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'spuid',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `ssv_id`(`spec_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 15 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shop_spec_value
 -- ----------------------------
-INSERT INTO `shop_spec_value` VALUES (1, 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '后置五摄', '2020-01-31 00:39:31.000000');
-INSERT INTO `shop_spec_value` VALUES (2, 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '骁龙730G', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_spec_value` VALUES (13, 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '5', '2020-01-31 21:09:19.000000', 'e3fec020-442a-11ea-aabe-35c76079655b');
+INSERT INTO `shop_spec_value` VALUES (14, 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '骁龙765', '2020-01-31 21:09:19.000000', 'e3fd1270-442a-11ea-aabe-35c76079655b');
 
 -- ----------------------------
 -- Table structure for shop_spu_spec
@@ -546,14 +556,25 @@ CREATE TABLE `shop_spu_spec`  (
   `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 商品id',
   `spec_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '外键: 规格id',
   `createTime` datetime(6) NOT NULL COMMENT '创建时间',
+  `spu_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'spuid',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 15 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shop_spu_spec
 -- ----------------------------
-INSERT INTO `shop_spu_spec` VALUES (1, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 00:39:31.000000');
-INSERT INTO `shop_spu_spec` VALUES (2, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 00:39:31.000000');
+INSERT INTO `shop_spu_spec` VALUES (1, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:32:57.000000', '6ddf9110-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_spu_spec` VALUES (2, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:32:57.000000', '6ddfb820-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_spu_spec` VALUES (3, 'beb75e10-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:35:13.000000', 'becd5710-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_spu_spec` VALUES (4, 'beb75e10-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:35:13.000000', 'becd3000-441d-11ea-bfbd-812f243dd1f9');
+INSERT INTO `shop_spu_spec` VALUES (8, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:55:50.000000', '9ff53170-4420-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (7, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 19:55:50.000000', '9ff55880-4420-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (9, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 20:01:29.000000', '6a0c9340-4421-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (10, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 20:01:29.000000', '6a0cba50-4421-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (11, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 20:25:20.000000', 'bf1112a0-4424-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (12, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 20:25:20.000000', 'bf10eb90-4424-11ea-9dfb-f38d6d33b9b5');
+INSERT INTO `shop_spu_spec` VALUES (13, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'f4d065e0-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 21:09:19.000000', 'e3fec020-442a-11ea-aabe-35c76079655b');
+INSERT INTO `shop_spu_spec` VALUES (14, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'fd61d950-437e-11ea-a8c9-27ce6b8279d2', '2020-01-31 21:09:19.000000', 'e3fd1270-442a-11ea-aabe-35c76079655b');
 
 -- ----------------------------
 -- Table structure for shopimg
@@ -567,15 +588,13 @@ CREATE TABLE `shopimg`  (
   PRIMARY KEY (`imgid`) USING BTREE,
   INDEX `shopimgid`(`shopid`) USING BTREE,
   CONSTRAINT `shopimgid` FOREIGN KEY (`shopid`) REFERENCES `shopinfo` (`shop_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shopimg
 -- ----------------------------
-INSERT INTO `shopimg` VALUES (1, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/202016039313404.png', '2020-01-31 00:39:31.000000');
-INSERT INTO `shopimg` VALUES (2, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393133734.png', '2020-01-31 00:39:31.000000');
-INSERT INTO `shopimg` VALUES (3, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393135590.png', '2020-01-31 00:39:31.000000');
-INSERT INTO `shopimg` VALUES (4, '16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '/shop/2020160393135635.png', '2020-01-31 00:39:31.000000');
+INSERT INTO `shopimg` VALUES (2, 'beb75e10-441d-11ea-bfbd-812f243dd1f9', '/shop/20201619351340768.png', '2020-01-31 19:35:13.000000');
+INSERT INTO `shopimg` VALUES (7, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', '/shop/2020162191925221.png', '2020-01-31 21:09:19.000000');
 
 -- ----------------------------
 -- Table structure for shopinfo
@@ -602,7 +621,29 @@ CREATE TABLE `shopinfo`  (
 -- ----------------------------
 -- Records of shopinfo
 -- ----------------------------
-INSERT INTO `shopinfo` VALUES ('16ef98d0-437f-11ea-a8c9-27ce6b8279d2', '小米CC9 Pro 1亿像素 五摄四闪 10倍混合光学变焦 5260mAh 屏下指纹 魔法绿镜 8GB+128GB 游戏智能拍照手机', '【只需2799春节好礼带回家！限时白条6期免息，赠1TB小米云空间1年使用权】', 1, 2399.00, '1', '2020-01-31 00:39:31.000000', 0, '', 0);
+INSERT INTO `shopinfo` VALUES ('1af5d400-441d-11ea-bfbd-812f243dd1f9', '小米CC9', '小米cc', 1, 1399.00, '1', '2020-01-31 19:30:38.000000', 0, '', 0);
+INSERT INTO `shopinfo` VALUES ('2fbe6a50-441d-11ea-bfbd-812f243dd1f9', 'K30', 'redmi', 1, 1999.00, '1', '2020-01-31 19:31:13.000000', 0, '', 0);
+INSERT INTO `shopinfo` VALUES ('6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 'cc9', 'x', 1, 1399.00, '1', '2020-01-31 19:32:57.000000', 0, 'undefined', 0);
+INSERT INTO `shopinfo` VALUES ('beb75e10-441d-11ea-bfbd-812f243dd1f9', 'K30', 'xiaomi', 1, 1999.00, '1', '2020-01-31 19:35:13.000000', 0, '', 0);
+
+-- ----------------------------
+-- Table structure for sku_stock
+-- ----------------------------
+DROP TABLE IF EXISTS `sku_stock`;
+CREATE TABLE `sku_stock`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '商品id',
+  `price` decimal(10, 2) NOT NULL COMMENT '价格',
+  `stock` int(11) NOT NULL DEFAULT 0 COMMENT '库存',
+  `sku_concat` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT '对应sku JSON',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `sku_concat`(`sku_concat`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sku_stock
+-- ----------------------------
+INSERT INTO `sku_stock` VALUES (4, '6dd4bba0-441d-11ea-bfbd-812f243dd1f9', 1699.00, 105, '{\"内存\":\"64G\",\"颜色\":\"白色\"}');
 
 -- ----------------------------
 -- Table structure for sortinfo
