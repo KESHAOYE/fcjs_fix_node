@@ -9,6 +9,7 @@ let app = express()
 
 app.post('/GET', (req, res, next) => {
     let { phone } = req.body
+    console.log(phone);
     regs.checkphonenumber(phone, (data) => {
         if (data) {
             res.json({

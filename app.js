@@ -6,12 +6,12 @@ var logger = require('morgan');
 const fs = require('fs')
 var FileStreamRotator = require('file-stream-rotator');
 var bodyParser = require('body-parser');
+var chat = require('./util/chat')
+chat();
 
 
 var indexRouter = require('./routes/index');
 var brandRouter = require('./routes/home/brand');
-// var adapiRouter = require("./routes/ad/adapi");
-var fixmodelRouter = require('./routes/home/fixmodel')
 var sortRouter = require('./routes/home/sort')
 
 var app = express();
@@ -40,9 +40,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-// app.use('/adapi',adapiRouter);
 app.use('/brand', brandRouter);
-app.use('/fixmodel', fixmodelRouter)
 app.use('/sort', sortRouter)
 let login = require('./routes/user/login')
 app.use('/login', login)
@@ -50,8 +48,6 @@ let imgValidator = require('./routes/user/imgValidator')
 app.use('/imgValidator', imgValidator)
 let register = require('./routes/user/register')
 app.use('/register', register)
-let order = require('./routes/user/order')
-app.use('/order', order)
 let ad = require('./routes/ad/adapi')
 app.use('/ad', ad)
 let phoneValidator = require('./routes/user/phoneValidator')
@@ -64,6 +60,24 @@ let shop = require('./routes/shop/shop')
 app.use('/shop', shop)
 let stock = require('./routes/shop/stock')
 app.use('/stock',stock)
+let fixitem = require('./routes/fix/fixitem')
+app.use('/fixitem',fixitem)
+let fixitemsort = require('./routes/fix/fixitemsort')
+app.use('/fixitemsort',fixitemsort)
+let fixmodel = require('./routes/fix/fixmodel')
+app.use('/fixmodel',fixmodel)
+let coupon = require('./routes/home/coupon')
+app.use('/coupon',coupon)
+let search = require('./routes/shop/search')
+app.use('/search',search)
+let comment = require('./routes/comment/comment')
+app.use('/comment',comment)
+let shopcar = require('./routes/order/shopcar')
+app.use('/shopcar',shopcar)
+let address = require('./routes/user/address')
+app.use('/address',address)
+let order = require('./routes/order/order')
+app.use('/order',order)
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

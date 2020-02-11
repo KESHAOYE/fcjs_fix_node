@@ -17,7 +17,7 @@ app.use('/GETADMINSTATE',(req,res,next)=>{
     DECLARE rid INT(11);
     DECLARE userid varchar(255);
     SELECT user_id INTO userid from userinfo where phone = '${phone}';
-    SELECT roleid INTO rid FROM roleuser where userid = userid;
+    SELECT roleid INTO rid FROM roleuser r where r.userid = userid;
     SELECT * FROM role where id = rid;
     END;
     CALL roleinfo()`

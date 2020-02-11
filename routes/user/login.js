@@ -41,7 +41,7 @@ app.use('/LOGINAUTO', async(req, res, next) => {
             })
             .catch(err => {
                 res.json({
-                    code: 600,
+                    code: 601,
                     message: err
                 })
             })

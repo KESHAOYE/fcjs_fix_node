@@ -1,13 +1,13 @@
 <script src="https://cdn.bootcss.com/socket.io/2.3.0/socket.io.dev.js"></script>
 <script>
-    var soc = io('http://localhost:200');
+  var soc = io('http://localhost:200');
   window.onload = function () {
   //向指定的服务器建立连接，地址可以省略
   var customId = prompt('输入名字')
   soc.on('connect',()=>{
+    soc.emit('storeClientInfo', {customId: customId,type:'ADMIN'})
     console.log('连接成功');
     console.log('用户名'+customId);
-    soc.emit('storeClientInfo', {customId: customId})
   })
   /**
    * 失去连接
@@ -33,14 +33,15 @@
       console.log(data)
   })
   soc.on('sayto', (data)=>{
+      console.log(data)
       console.log(`${data.user}向您发送了:${data.msg}`)
   })
 }
   function send() {
     let data = document.getElementsByClassName('message')[0].value
     let user = document.getElementsByClassName('user')[0].value
-    console.log(`用户:${data}`)
-    soc.emit('sayto', {msg:data,id:user})
+    console.log(`用户:${user}`)
+    soc.emit('msg', {msg:data,id:user})
   }
 </script>
 <html>

@@ -4,6 +4,9 @@ const app = express();
 const token = require('../../util/token')
 const tokens =new token()
 const time = require('../../util/time')
+const img = require('../../util/img')
+const imgutil = new img()
+
 
 // 获取分类
 app.use('/GETSORT', (req, res, next) => {
@@ -14,13 +17,13 @@ app.use('/GETSORT', (req, res, next) => {
     mysql(sql)
         .then(data => {
             let b = []
-            data.forEach(function(cur) {
+            data.forEach((cur)=>{
                 let index = b.findIndex((item) => item.sortid == cur.sortid)
                 if (index != -1) {
                     let object = {
                         shopid: cur.shop_id,
                         shopname: cur.shopname,
-                        shopimg: cur.path
+                        shopimg: imgutil.imgtobase(`./public${cur.path}`)
                     }
                     b[index].data.push(object)
                 } else {
@@ -28,11 +31,14 @@ app.use('/GETSORT', (req, res, next) => {
                         sortid: cur.sortid,
                         sortname: cur.sortname,
                         sortename: cur.sortename,
-                        data: [{
-                            shopid: cur.shop_id,
-                            shopname: cur.shopname,
-                            shopimg: cur.path
-                        }]
+                        data: []
+                    }
+                    if(cur.shop_id!=null){
+                       object.data.push({
+                        shopid: cur.shop_id,
+                        shopname: cur.shopname,
+                        shopimg: imgutil.imgtobase(`./public${cur.path}`)
+                    })
                     }
                     b.push(object)
                 }

@@ -153,10 +153,11 @@ app.use('/GETSHOPBYID', (req, res, next) => {
         shopid
     } = req.body
     let sql = `
-    select s.shop_id,s.price,shopname,s.shopdes,sort.sortid,brand.brandid,sort.sortname,brand.brandname,a.article_content,s.isold,s.old_type,si.path from article_info a,shopinfo s,sortinfo sort,brandinfo brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.delete = 0 and s.shop_id = '${shopid}' ;
+    select s.shop_id,s.price,shopname,s.shopdes,sort.sortid,brand.brandid,sort.sortname,brand.brandname,brand.brandename,a.article_content,s.isold,s.old_type,si.path from article_info a,shopinfo s,sortinfo sort,brandinfo brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.delete = 0 and s.shop_id = '${shopid}' ;
     select s.shop_id,ss.spec_name,ss.spec_id,ssv.spec_value from shopinfo s,shop_spec ss,shop_spu_spec sps,shop_spec_value ssv WHERE s.shop_id = sps.shop_id and 
     ss.spec_id = ssv.spec_id and ss.spec_id = sps.spec_id and s.delete = 0 and sps.spu_id = ssv.spu_id and s.shop_id = '${shopid}';
-    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.delete = 0 and s.shop_id = '${shopid}' GROUP BY sks.sku_id;`
+    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.delete = 0 and s.shop_id = '${shopid}' GROUP BY sks.sku_id;
+    select count(*) as count from order_shop where shop_id = '${shopid}';`
     mysql(sql)
         .then(a => {
             let result = []
@@ -180,10 +181,12 @@ app.use('/GETSHOPBYID', (req, res, next) => {
                         sortname: el.sortname,
                         brandid: el.brandid,
                         brandname: el.brandname,
+                        brandename: el.brandename,
                         isold: el.isold,
                         price: el.price,
                         oldType: el.oldtype,
                         shopdetail: el.article_content,
+                        sailCount: JSON.parse(JSON.stringify(a[3]))[0].count,
                         img: [],
                         spu: [],
                         sku: []
@@ -343,10 +346,11 @@ function deletespec(shop_id) {
     return new Promise((resolve, reject) => {
         let sql = `
         delete from shop_spec_value where spec_id = any(select spec_id from shop_spu_spec where shop_id = '${shop_id}');
-        DELETE from shop_spu_spec where shop_id = '${shop_id}'
+        DELETE from shop_spu_spec where shop_id = '${shop_id}';
         -- 删除sku
         delete from shop_sku_spec_value where sku_id = any(SELECT sku_id from shop_sku_spec where shop_id = '${shop_id}');
-        DELETE from shop_sku_spec where shop_id = '${shop_id}'`
+        DELETE from shop_sku_spec where shop_id = '${shop_id}';
+        delete from sku_stock where shop_id = any(select shop_id from shopinfo where shop_id = '${shop_id}')`;
         mysql(sql)
             .then(data => {
                 resolve()
@@ -451,4 +455,22 @@ app.use('/DELETESHOP', (req, res, next) => {
             })
         })
 })
+app.use('/GETSTOCK',(req,res,next)=>{
+    let {shopid} = req.body
+    let sql = `select * from sku_stock where shop_id = '${shopid}'`
+    mysql(sql)
+    .then(data=>{
+        res.json({
+          code: 200,
+          info:data
+        })
+    })
+    .catch(err=>{
+        res.json({
+            code: 600,
+            message:err
+        })
+    })
+})
+
 module.exports = app

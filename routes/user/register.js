@@ -35,6 +35,7 @@ app.use('/REGISTERNEW', async(req, res, next) => {
     let {
         name,
         phone,
+        validator,
         password
     } = req.body
     reg.checkusername(name, (data) => {

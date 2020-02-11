@@ -15,14 +15,31 @@ app.use('/GETAD', (req, res, next) => {
     let {
         adid
     } = req.body
-    let sql = `SELECT * FROM adinfo where adid = ${adid} and DATE(startdue) <= DATE(NOW()) and DATE(overdue)>=DATE(NOW())  `
+    let a ={
+        0: '1',
+        1: 'adid = 1',
+        2: 'adid = 2 and s.shop_id = a.shopid',
+        undefined: '1'
+    }[adid]
+    let sql = `SELECT a.id,a.res,a.adimg,s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE(NOW()) and DATE(overdue)>=DATE(NOW()) and isshow = 1 and ${a} group by id`
     mysql(sql)
         .then(data => {
+            data = JSON.parse(JSON.stringify(data))
+            let result = []
+            data.forEach(el=>{
+            const da={
+              id: el.id,
+              adimg: imgutil.imgtobase(`./public${el.adimg}`),
+              shopname:el.shopname,
+              shopdes:el.res
+            }
+            result.push(da)
+        })
             res.json({
                 code: 200,
                 status: true,
                 adid: adid,
-                info: data
+                info: result
             })
         })
         .catch(err => {
@@ -41,7 +58,8 @@ app.use('/ADDAD', (req, res, next) => {
         adimg,
         startdue,
         overdue,
-        shopid
+        shopid,
+        shopres
     } = req.body
     let _t_ = req.headers.authorization
     let imgs = imgutil.saveImg('/ad/',adimg)
@@ -50,7 +68,7 @@ app.use('/ADDAD', (req, res, next) => {
     let t = tokens.checkAdminToken(phone, _t_,roleid)
     const ct = time.getTime()
     t.then(data => {
-            let sql = shopid == '' ? `insert into adinfo(id,adid,adimg,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')` : `insert into adinfo(id,adid,adimg,shopid,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}',${shopid},'${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')`
+            let sql = shopid == '' ? `insert into adinfo(id,adid,adimg,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')` : `insert into adinfo(id,adid,adimg,shopid,shopres,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${shopid}','${shopres}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -119,7 +137,7 @@ app.use('/DELETEAD', (req, res, next) => {
     let phone = req.headers.phone
     let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
-            let sql = `update adinfo set isshow = ${0} where id = ${id}`
+            let sql = `update adinfo set isshow = ${0} where id = '${id}'`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -142,7 +160,7 @@ app.use('/DELETEAD', (req, res, next) => {
 })
 app.use('/GETADBYID',(req,res,next)=>{
     let {id} = req.body
-    let sql = `select *,s.shopname from adinfo a,shopinfo s where a.id = ${id} and a.shopid =  s.shop_id `
+    let sql = `select *,s.shopname from adinfo a,shopinfo s where a.id = '${id}' and a.shopid =  s.shop_id `
     mysql(sql).then(data => {
         data = JSON.parse(JSON.stringify(data))[0]
         data.adimg=imgutil.imgtobase(`./public${data.adimg}`)
@@ -172,12 +190,12 @@ app.use('/GETADS',(req,res,next)=>{
     let a ={
         0: '1',
         1: 'adid = 1',
-        2: 'adid = 2',
+        2: 'adid = 2 and s.shop_id = a.shopid',
         undefined: '1'
     }[adid]
     let start = (page-1)*pageSize
-    let sql = `select id,adid,res,s.shopname,adimg,startdue,overdue,isshow from adinfo a,shopinfo s where s.shop_id = a.shopid and ${s} and ${a} group by id  order by isshow desc limit ${start},${pageSize}`
-    let sq = `select count(*) as count from adinfo a,shopinfo s where s.shop_id = a.shopid and ${s} and ${a}`
+    let sql = `select id,adid,res,s.shopname,adimg,startdue,overdue,isshow from adinfo a,shopinfo s where ${s} and ${a} group by id  order by isshow desc limit ${start},${pageSize}`
+    let sq = `select count(*) as count from adinfo a,shopinfo s where ${s} and ${a}`
     mysql(sql)
     .then(da=>{
         mysql(sq).then(data=>{
