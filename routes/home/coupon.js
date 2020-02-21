@@ -13,9 +13,9 @@ app.use('/GETCOUPONBYID', (req, res, next) => {
     } = req.body
     let sql = {
         1: `select c.coupon_id,c.use_type,c.get_date,c.amount,c.min_price,c.public_count,c.start_time,c.note,c.per_limit,c.over_time,s.shop_id,s.shopname from coupon c,shopinfo s,coupon_shop cs where c.coupon_id = '${coupon_id}' and cs.coupon_id = c.coupon_id and cs.shop_id = s.shop_id and isshow = 0`,
-        2: `select c.coupon_id,c.use_type,c.get_date,c.min_price,c.public_count,c.start_time,c.over_time,s.sortid,s.sortname from coupon c,sortinfo s,coupon_sort cs where c.coupon_id = 1 and cs.coupon_id = c.coupon_id and cs.sort_id = s.sortid and c.isshow = 0`,
-        0: `select * from coupon where isshow = 0`,
-        undefined: `select * from coupon where isshow = 0`
+        2: `select c.coupon_id,c.use_type,c.get_date,c.min_price,c.public_count,c.start_time,c.over_time,s.sortid,s.sortname from coupon c,sortinfo s,coupon_sort cs where c.coupon_id = 1 and cs.coupon_id = c.coupon_id and c.coupon_id = '${coupon_id}' and cs.sort_id = s.sortid and c.isshow = 0`,
+        0: `select * from coupon where coupon_id = '${coupon_id}' and isshow = 0`,
+        undefined: `select * from coupon where coupon_id = '${coupon_id}' and isshow = 0`
     } [use_type]
     mysql(sql)
         .then(data => {
@@ -205,7 +205,7 @@ app.use('/GETSHOPCOUPON', (req, res, next) => {
     } = req.body
     let sql = `select c.id,c.coupon_id,c.note,c.amount,c.min_price from coupon c where c.coupon_id = any(
         select coupon_id from coupon_shop where shop_id = '${shopid}'
-      ) or c.coupon_id = any(select coupon_id from coupon_sort where sort_id = '${sortid}') or c.use_type = '0' GROUP BY c.coupon_id`
+      )  or c.coupon_id = any(select coupon_id from coupon_sort where sort_id = '${sortid}') or c.use_type = '0'  and c.get_date >= '${time.getTime()}' GROUP BY c.coupon_id`
     mysql(sql)
         .then(data => {
             res.json({
@@ -242,7 +242,7 @@ app.use('/USERGETCOUPON', (req, res, next) => {
         select u.user_id INTO userid from userinfo u where u.phone = phone;
         SELECT c.receive_count INTO rcount from coupon c where c.coupon_id = couponid;
         UPDATE coupon c set c.receive_count = rcount + 1 where c.coupon_id = couponid;
-        INSERT INTO usercoupon(coupon_id,user_id,createTime) VALUES(couponid,userid,NOW());
+        INSERT INTO usercoupon(coupon_id,user_id,createTime) VALUES(couponid,userid,'${time.getTime()}');
         END;
         CALL usergetcoupon('${phone}','${id}')`
         mysql(s)

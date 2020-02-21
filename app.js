@@ -15,12 +15,13 @@ var brandRouter = require('./routes/home/brand');
 var sortRouter = require('./routes/home/sort')
 
 var app = express();
+
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+app.locals.pretty = true;
 var logDirectory = __dirname + '/logs';
 //确保日志文件目录存在 没有则创建
 fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
@@ -39,45 +40,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+let {log} = require('./util/log')
+
 app.use('/', indexRouter);
-app.use('/brand', brandRouter);
-app.use('/sort', sortRouter)
-let login = require('./routes/user/login')
-app.use('/login', login)
-let imgValidator = require('./routes/user/imgValidator')
-app.use('/imgValidator', imgValidator)
-let register = require('./routes/user/register')
-app.use('/register', register)
-let ad = require('./routes/ad/adapi')
-app.use('/ad', ad)
-let phoneValidator = require('./routes/user/phoneValidator')
-app.use('/phoneValidator', phoneValidator)
-let adminlogin = require('./routes/admin/adminlogin')
-app.use('/adminlogin', adminlogin)
-let spec = require('./routes/shop/spec')
-app.use('/spec', spec)
-let shop = require('./routes/shop/shop')
-app.use('/shop', shop)
-let stock = require('./routes/shop/stock')
-app.use('/stock',stock)
-let fixitem = require('./routes/fix/fixitem')
-app.use('/fixitem',fixitem)
-let fixitemsort = require('./routes/fix/fixitemsort')
-app.use('/fixitemsort',fixitemsort)
-let fixmodel = require('./routes/fix/fixmodel')
-app.use('/fixmodel',fixmodel)
-let coupon = require('./routes/home/coupon')
-app.use('/coupon',coupon)
-let search = require('./routes/shop/search')
-app.use('/search',search)
-let comment = require('./routes/comment/comment')
-app.use('/comment',comment)
-let shopcar = require('./routes/order/shopcar')
-app.use('/shopcar',shopcar)
-let address = require('./routes/user/address')
-app.use('/address',address)
-let order = require('./routes/order/order')
-app.use('/order',order)
+app.use('/brand',log, brandRouter);
+app.use('/sort',log, sortRouter)
+app.use('/login', require('./routes/user/login'))
+app.use('/imgValidator', require('./routes/user/imgValidator'))
+app.use('/register', require('./routes/user/register'))
+app.use('/ad', require('./routes/ad/adapi'))
+app.use('/phoneValidator', require('./routes/user/phoneValidator'))
+app.use('/adminlogin', require('./routes/admin/adminlogin'))
+app.use('/spec', require('./routes/shop/spec'))
+app.use('/shop', require('./routes/shop/shop'))
+app.use('/stock',require('./routes/shop/stock'))
+app.use('/fixitem',require('./routes/fix/fixitem'))
+app.use('/fixitemsort',require('./routes/fix/fixitemsort'))
+app.use('/fixmodel',require('./routes/fix/fixmodel'))
+app.use('/coupon',require('./routes/home/coupon'))
+app.use('/search',require('./routes/shop/search'))
+app.use('/comment',require('./routes/comment/comment'))
+app.use('/shopcar',require('./routes/order/shopcar'))
+app.use('/address',require('./routes/user/address'))
+app.use('/order',require('./routes/order/order'))
+app.use('/receive',require('./routes/user/receive'))
+app.use('/aftersail',require('./routes/order/aftersail'))
     // catch 404 and forward to error handler
     //捕捉404并抛出错误处理器
 app.use(function(req, res, next) {

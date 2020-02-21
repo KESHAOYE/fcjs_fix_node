@@ -15,15 +15,32 @@ class Time {
     }
     // 获取现在时间戳
     nowTimeStamp() {
+        process.env.TZ = 'Asia/Shanghai';
         return Math.floor(new Date().getTime() / 1000)
     }
     // 获取N天后的时间戳
     getOtherTimeStamp(n) {
+        process.env.TZ = 'Asia/Shanghai';
         n = parseInt(n)
         return Math.floor(new Date().getTime() / 1000) / 1000 + n * 60
     }
+    getdate(date){
+        date = date == undefined ? new Date :new Date(date);
+        var year = date.getFullYear();
+        var month = date.getMonth();
+        var day = date.getDate();
+        if (month < 10) {
+            month =  parseInt(month)+parseInt(1);
+            month = '0' + month
+        }
+        if (day < 10) {
+            day = '0' + day;
+        }
+        return `${year}-${month}-${day}`
+    }
     // 获取当前时间 YYYY-MM-DD HH:MM:SS
     getTime(date) {
+        process.env.TZ = 'Asia/Shanghai';
         date = date == undefined ? new Date :new Date(date);
 
         var year = date.getFullYear();
@@ -48,6 +65,7 @@ class Time {
     }
     // 获取当前时间 YYYY年MM月DD日 HH时MM分SS秒
     getCTime(date) {
+        process.env.TZ = 'Asia/Shanghai';
         date = date == undefined ? new Date :new Date(date);
         var year = date.getFullYear();
         var month = date.getMonth();

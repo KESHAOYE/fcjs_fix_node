@@ -21,7 +21,7 @@ app.use('/GETAD', (req, res, next) => {
         2: 'adid = 2 and s.shop_id = a.shopid',
         undefined: '1'
     }[adid]
-    let sql = `SELECT a.id,a.res,a.adimg,s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE(NOW()) and DATE(overdue)>=DATE(NOW()) and isshow = 1 and ${a} group by id`
+    let sql = `SELECT a.id,a.res,a.adimg,s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}') and isshow = 0 and ${a} group by id`
     mysql(sql)
         .then(data => {
             data = JSON.parse(JSON.stringify(data))
@@ -68,7 +68,7 @@ app.use('/ADDAD', (req, res, next) => {
     let t = tokens.checkAdminToken(phone, _t_,roleid)
     const ct = time.getTime()
     t.then(data => {
-            let sql = shopid == '' ? `insert into adinfo(id,adid,adimg,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')` : `insert into adinfo(id,adid,adimg,shopid,shopres,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${shopid}','${shopres}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')`
+            let sql = shopid == '' ? `insert into adinfo(id,adid,adimg,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')` : `insert into adinfo(id,adid,adimg,shopid,res,startdue,overdue,create_man,createTime) values('${uuid.v1()}','${adid}','${imgs}','${shopid}','${shopres}','${time.getTime(startdue)}','${time.getTime(overdue)}','${phone}','${ct}')`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -183,8 +183,8 @@ app.use('/GETADS',(req,res,next)=>{
     let {adid , isover, page, pageSize} = req.body
     let s = {
         0: '1',
-        1: 'DATE(startdue) <= DATE(NOW()) and DATE(overdue)>=DATE(NOW())',
-        2: 'DATE(startdue) >= DATE(NOW()) or DATE(overdue) <= DATE(NOW())',
+        1: `DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}')`,
+        2: `DATE(startdue) >= DATE('${time.getTime()}') or DATE(overdue) <= DATE('${time.getTime()}')`,
         undefined: '1'
     }[isover]
     let a ={

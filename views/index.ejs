@@ -2,9 +2,24 @@
 <html>
   <head>
     <title><%= title %></title>
+    <script>
+      setTimeout(()=>{
+      let a = '<%= data%>'
+      let arr = a.split(',')
+      let count = arr.length
+      document.getElementsByClassName('count')[0].innerHTML = `今日已访问接口次数： <span style= 'color:red'>${count}</span>`
+      for(let i in arr){
+        document.getElementsByClassName('list')[0].innerHTML += `<p>${arr[i]}</p>`
+      }
+    },0)
+    </script>
   </head>
   <body>
     <h1><%= title %></h1>
     <h2><%= tip %> o(*￣▽￣*)ブ</h2>
+    <h2 class="count"></h2>
+    <div class="list">
+
+    </div>
   </body>
 </html>
