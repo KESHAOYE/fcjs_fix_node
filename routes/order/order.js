@@ -304,7 +304,7 @@ app.use('/GETCENTERORDERINFO', (req, res, next) => {
     type
   } = req.body
   let start = (page - 1) * pageSize
-  let fixsql = userid == 'all' ? `select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id limit ${start},${pageSize * page};` : ` select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where o.user_id = (select phone from userinfo u where u.user_id = '1580886692') and fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id and o.order_state ${type} limit ${start},${pageSize * page}`
+  let fixsql = userid == 'all' ? `select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id limit ${start},${pageSize * page};` : ` select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where o.user_id = (select phone from userinfo u where u.user_id = '${userid}') and fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id and o.order_state ${type} limit ${start},${pageSize * page}`
   let s = `select count(*) as count from orderinfo o where o.order_state ${type}`
   let result = []
   mysql(fixsql)
@@ -348,7 +348,8 @@ app.use('/PAY', (req, res, next) => {
     address_id,
     coupon_id,
     payid,
-    user_id
+    user_id,
+    type
   } = req.body
   let _t_ = req.headers.authorization
   let phone = req.headers.phone
@@ -367,10 +368,10 @@ app.use('/PAY', (req, res, next) => {
   DECLARE order_price DECIMAL(10,2) default 0;
   select amount INTO coupon_amount from coupon c where c.coupon_id = coupon_id;
   select order_money into order_price from orderinfo o where o.order_id = order_id;
-  update orderinfo o set order_state = 41,pay_id = pay_id, addressId = address_id,true_price = order_price - coupon_amount where o.order_id = order_id;
+  update orderinfo o set order_state = ${type},pay_id = pay_id, addressId = address_id,true_price = order_price - coupon_amount where o.order_id = order_id;
   update usercoupon set use_status = 1,use_time = '${time.getTime()}',order_id =order_id where user_id = user_id and coupon_id = coupon_id;
   insert into payinfo(user_id,order_id,count,paym_id,pay_bdate) VALUES(user_id,order_id,order_price - coupon_amount,pay_id,'${time.getTime()}');
-  INSERT into order_state(order_id,now_state,createTime) VALUES(order_id,41,'${time.getTime()}');
+  INSERT into order_state(order_id,now_state,createTime) VALUES(order_id,${type},'${time.getTime()}');
   END;
   CALL payorder('${order_id}','${address_id}','${coupon_id}','${payid}','${user_id}')`
       mysql(sql)
@@ -395,26 +396,28 @@ app.use('/PAY', (req, res, next) => {
     })
 })
 
-app.use('/GETFIXORDERDETAIL',(req,res,next)=>{
-  let {orderid} = req.body
+app.use('/GETFIXORDERDETAIL', (req, res, next) => {
+  let {
+    orderid
+  } = req.body
   let sql = `select * from fixorderitem f,fixitem fi,fixorder fo,fixmodel fm where f.order_id = '${orderid}' and f.item_id = fi.item_id and f.model_id = fm.model_id and fo.order_id = f.order_id`
   mysql(sql)
-        .then(data => {
-          res.json({
-            code: 200,
-            info: data
-          })
-        })
-        .catch(err => {
-          res.json({
-            code: 600,
-            message: '获取失败' + err
-          })
-        })
+    .then(data => {
+      res.json({
+        code: 200,
+        info: data
+      })
+    })
+    .catch(err => {
+      res.json({
+        code: 600,
+        message: '获取失败' + err
+      })
+    })
 })
 
 //获取待核验的订单
-app.use('/GETUNFIX',(req,res,next)=>{
+app.use('/GETUNFIX', (req, res, next) => {
   let {
     page,
     pageSize
@@ -442,19 +445,24 @@ app.use('/GETUNFIX',(req,res,next)=>{
     })
 })
 
-app.use('/WAITFIX',(req,res,next)=>{
-  let {orderid,man_price,des,phonename} = req.body
+app.use('/WAITFIX', (req, res, next) => {
+  let {
+    orderid,
+    man_price,
+    des,
+    phonename
+  } = req.body
   let _t_ = req.headers.authorization
   let roleid = req.headers.roleid
   let phones = req.headers.phone
   let t = tokens.checkAdminToken(phones, _t_, roleid)
   t.then(data => {
-  let sql = `update orderinfo set order_state = 1 where order_id = '${orderid}';
+      let sql = `update orderinfo set order_state = 1 where order_id = '${orderid}';
   update fixorder set man_price = '${man_price}',des = '${des}' where order_id = '${orderid}';
   INSERT into order_state(order_id,now_state,createTime) VALUES('${orderid}',1,'${time.getTime()}');
   select a.phone from address_info a ,orderinfo o where o.order_id = '${orderid}' and o.addressid = a.addressid;
   `
-  mysql(sql)
+      mysql(sql)
         .then(data => {
           data = JSON.parse(JSON.stringify(data))
           let querydata = queryString.stringify({
@@ -493,7 +501,7 @@ app.use('/WAITFIX',(req,res,next)=>{
     .catch(err => {
       res.json({
         code: 601,
-        message: '你没有权限'+err
+        message: '你没有权限' + err
       })
     })
 })
@@ -540,16 +548,19 @@ app.use('/SEND', (req, res, next) => {
   t.then(data => {
       let sql = `update orderinfo set order_state = 5 where order_id = '${orderid}';
   insert into order_state(order_id,now_state,createTime) values('${orderid}','5','${time.getTime()}');
+  select a.phone from address_info a ,orderinfo o where o.order_id = '${orderid}' and o.addressid = a.addressid;
   `
       mysql(sql)
         .then(data => {
+          data = JSON.parse(JSON.stringify(data))
+          console.log(data[2][0].phone);
           let querydata = queryString.stringify({
             action: 'send',
             userid: '7530',
             account: 'tebicom',
             password: 'tebicom123',
             content: `【福城建设】: 尊敬的用户，您的订单已完成发货，希望您能给个好评喔，详情请前往订单中心查看！`,
-            mobile: `${phone}`
+            mobile: data[2][0].phone
           })
           let option = {
             url: `http://sms.37037.com/sms.aspx?${querydata}`
@@ -560,6 +571,7 @@ app.use('/SEND', (req, res, next) => {
           });
           http(option, (err, re, body) => {
             xmls.parseString(body, (err, data) => {
+              console.log(data);
               data = data.returnsms
               if (data.returnstatus == 'Success') {
                 res.json({
@@ -587,14 +599,17 @@ app.use('/SEND', (req, res, next) => {
 // 确认收货
 app.use('/CONFIRM', (req, res, next) => {
   let {
-    orderid
+    orderid,
+    type
   } = req.body
   let _t_ = req.headers.authorization
   let phone = req.headers.phone
   let t = tokens.checkToken(phone, _t_)
   t.then(data => {
-      let sql = `update orderinfo set order_state = 6 where order_id = '${orderid}';
-  insert into order_state(order_id,now_state,createTime) values('${orderid}','6','${time.getTime()}')`
+    let sql = type == 0 ? `update orderinfo set order_state = 6 where order_id = '${orderid}';
+    insert into order_state(order_id,now_state,createTime) values('${orderid}','6','${time.getTime()}')`
+    : `update orderinfo set order_state = 7 where order_id = '${orderid}';
+    insert into order_state(order_id,now_state,createTime) values('${orderid}','7','${time.getTime()}')`
       mysql(sql)
         .then(data => {
           res.json({
@@ -612,7 +627,7 @@ app.use('/CONFIRM', (req, res, next) => {
     .catch(err => {
       res.json({
         code: 601,
-        message: '你没有权限'
+        message: '你没有权限'+err
       })
     })
 })
@@ -620,7 +635,7 @@ app.use('/CONFIRM', (req, res, next) => {
 function addfixitem(item, orderid) {
   let sql = ''
   item.selectitems.forEach(el => {
-    sql += `insert into fixorderitem(model_id,order_id,item_id) value('${item.selectphone}','${orderid}','${el.id}')`
+    sql += `insert into fixorderitem(model_id,order_id,item_id) value('${item.selectphone}','${orderid}','${el.id}');`
   })
   mysql(sql)
 }
@@ -662,6 +677,50 @@ app.use('/CREATEFIXORDER', (req, res, next) => {
       res.json({
         code: 601,
         message: '你没有权限'
+      })
+    })
+})
+
+app.use('/GETFIXORDERITEM', (req, res, next) => {
+  let {
+    orderid
+  } = req.body
+  let sql = `select fo.order_id,f.model_name as shopname,f.model_img as shopimg,fi.item_id,fi.item_name,fo.man_price as price from fixorderitem o,fixmodel f,fixitem fi,fixorder fo WHERE o.order_id = '${orderid}' and fo.order_id = o.order_id and o.model_id = f.model_id and fi.item_id = o.item_id`
+  mysql(sql)
+    .then(data => {
+      data = JSON.parse(JSON.stringify(data))
+      let result = []
+      data.forEach(el => {
+        let index = result.findIndex(els => {
+          return el.order_id == els.order_id
+        })
+        if (index == -1) {
+          const d = {
+            order_id: el.order_id,
+            shopname: el.shopname,
+            path: imgutil.imgtobase(`./public${el.shopimg}`),
+            price: el.price,
+            count: 1,
+            sku: [{
+              item_name: el.item_name
+            }]
+          }
+          result.push(d)
+        } else {
+          result[index].sku.push({
+            item_name: el.item_name
+          })
+        }
+      })
+      res.json({
+        code: 200,
+        info: result
+      })
+    })
+    .catch(err => {
+      res.json({
+        code: 600,
+        message: '获取失败' + err
       })
     })
 })

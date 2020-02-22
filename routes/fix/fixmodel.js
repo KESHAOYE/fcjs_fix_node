@@ -262,4 +262,53 @@ app.use('/UGETFIXBRAND', (req, res, next) => {
             })
         })
 })
+
+// 获取等待维修的机型
+app.use('/GETWAITFIX',(req,res,next)=>{
+    let _t_ = req.headers.authorization
+    let roleid = req.headers.roleid
+    let phone = req.headers.phone
+    let t = tokens.checkAdminToken(phone, _t_, roleid)
+    const ct = time.getTime()
+    t.then(data => {
+        let sql = `select * from orderinfo where order_state = 2 and order_type = 1`
+            mysql(sql)
+                .then(data => {
+                    res.json({
+                        code: 200,
+                        info: data
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: '获取失败' + err
+                    })
+                })
+        })
+    .catch(err => {
+        res.json({
+            code: 601,
+            message: '你没有权限' + err
+        })
+    })
+})
+
+app.use('/GETFIXMONEY',(req,res,next)=>{
+  let {orderid} = req.body
+  let sql = `select man_price from fixorder where order_id = '${orderid}'`
+  mysql(sql)
+                .then(data => {
+                    res.json({
+                        code: 200,
+                        info: data
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: '获取失败' + err
+                    })
+                })
+})
 module.exports = app

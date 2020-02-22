@@ -45,7 +45,7 @@ app.use('/GETCOMMENT', (req, res, next) => {
       data = JSON.parse(JSON.stringify(data))
       data.forEach((el, index) => {
         data[index].headimg = data[index].headimg == null ? 'http://localhost:3000/userHead/default.png' : data[index].headimg
-        if (data[index].comment_img.length > 0)
+        if (data[index].comment_img.length > 0 && data[index].comment_img != 'undefined'){
           data[index].comment_img = data[index].comment_img.replace(/data:image\/jpeg;base64,/g, '')
         data[index].comment_img = data[index].comment_img.split(',')
         data[index].comment_img.forEach((el, indexs) => {
@@ -56,6 +56,7 @@ app.use('/GETCOMMENT', (req, res, next) => {
             data[index].comment_img[indexs] = 'data:image/jpeg;base64,' + el
           }
         })
+      }
       })
 
       res.json({
