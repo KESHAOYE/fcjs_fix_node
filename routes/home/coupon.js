@@ -56,6 +56,26 @@ app.use('/GETCOUPONBYSORT', (req, res, next) => {
         })
 })
 
+app.use('/GETCOUPONS',(req,res,next)=>{
+  let {count} = req.body
+  let sql = `select * from coupon where isshow = 0 and DATE(over_time) >= '${time.getTime()}' and get_date >= '${time.getTime()}' limit 0,${count}`
+  mysql(sql)
+        .then(data => {
+            res.json({
+                code: 200,
+                status: true,
+                info: data
+            })
+        })
+        .catch(err => {
+            res.json({
+                code: 600,
+                status: false,
+                message: err
+            })
+        })
+})
+
 // 添加活动 / 优惠券
 app.use('/ADDCOUPON', (req, res, next) => {
     let {

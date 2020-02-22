@@ -8,6 +8,8 @@ const time = require('../../util/time')
 const img = require('../../util/img')
 const imgs = new img()
 const regs = require('../../util/reg')
+const token = require('../../util/token')
+let tokens = new token()
 const reg = new regs()
 
 let app = express()
@@ -134,16 +136,19 @@ app.use('/FULLINFO', async(req, res, next) => {
             message: '不存在该用户，无法修改信息'
         })
     } else {
-        let head = headimg != '' ? imgs.saveImg('./public/userHead/', headimg) : ''
+        let head =''
+        if(headimg.indexOf('default')==-1){
+         let head = headimg != '' ? imgs.saveImg('./public/userHead/', headimg) : ''
         if (head == 'Error: 您上传的不是图片') {
             res.json({
                 code: 600,
                 message: '您上传的不是图片'
             })
             return
-        }
+         }
+       }
         let sexs = { '男': 1, '女': 2 }[sex]
-        let sql = `update userinfo set id = '${id}', birthday = '${birth}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
+        let sql = `update userinfo set id = '${id}', birthday = '${time.getTime(birth)}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
         mysql(sql).then(data => {
                 res.json({
                     code: 200,
@@ -153,10 +158,48 @@ app.use('/FULLINFO', async(req, res, next) => {
             .catch(err => {
                 res.json({
                     code: 600,
-                    message: err
+                    message: '发生错误'
                 })
             })
     }
+})
+
+app.use('/CHANGEPASSWORD',(req,res,next)=>{
+  let { password,userid } = req.body
+  let _t_ = req.headers.authorization
+    let phone = req.headers.phone
+    let t = tokens.checkToken(phone, _t_)
+    reg.checkpassword(password, (data) => {
+        if (data) {
+            res.json({
+                code: 600,
+                message: data
+            })
+            return
+        }
+    })
+    let passwords = utility.md5(password)
+    t.then(data => {
+      let sql = `update userinfo set password = '${passwords}' where user_id = '${userid}'`
+      mysql(sql).then(data => {
+        res.json({
+            code: 200,
+            message: '已修改'
+        })
+    })
+    .catch(err => {
+        res.json({
+            code: 600,
+            message: '发生错误'
+        })
+    })
+    })
+    .catch(err => {
+        res.json({
+            code: 601,
+            message: '你没有权限'
+        })
+    })
 })
 
 module.exports = app

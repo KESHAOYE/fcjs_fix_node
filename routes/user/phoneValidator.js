@@ -9,7 +9,6 @@ let app = express()
 
 app.post('/GET', (req, res, next) => {
     let { phone } = req.body
-    console.log(phone);
     regs.checkphonenumber(phone, (data) => {
         if (data) {
             res.json({
@@ -57,6 +56,7 @@ app.post('/GET', (req, res, next) => {
 
 app.post('/CHECK', async(req, res, next) => {
     let { v, phone } = req.body
+    console.log(v,phone);
     let time = 0
     let fv = 0
     await new Promise(function(resolve, reject) {

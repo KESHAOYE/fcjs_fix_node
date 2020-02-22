@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 22/02/2020 11:42:47
+ Date: 22/02/2020 23:03:48
 */
 
 SET NAMES utf8mb4;
@@ -196,7 +196,14 @@ CREATE TABLE `coupon` (
   `isshow` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `coupon_id` (`coupon_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='优惠券';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='优惠券';
+
+-- ----------------------------
+-- Records of coupon
+-- ----------------------------
+BEGIN;
+INSERT INTO `coupon` VALUES (1, '5571a760-555e-11ea-af53-839e2c0811db', 0, 50.00, 1, 1000.00, '2020-02-22 00:00:00.000000', '2020-05-31 00:00:00.000000', '0', '武汉加油！', 100, 0, '2020-05-25 00:00:00.000000', 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for coupon_shop
@@ -1109,7 +1116,7 @@ CREATE TABLE `userinfo` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `userinfo` VALUES ('1580038654', 'ke', 1, NULL, NULL, '18089008889', NULL, NULL, 'e10adc3949ba59abbe56e057f20f883e', NULL, 0.00, '2020-01-26 17:55:42.000000', 2, NULL, 0);
-INSERT INTO `userinfo` VALUES ('1580886692', 'KESHAOYE', 1, NULL, NULL, '15359639480', NULL, NULL, '4c17db7e2f293c24b34d406ad2012d46', NULL, 0.00, '2020-02-05 15:10:58.000000', 2, NULL, 0);
+INSERT INTO `userinfo` VALUES ('1580886692', 'KESHAOYE', 1, '350103199808141910', '李柯伟', '15359639480', '2020-02-22 22:59:45.321020', NULL, 'e10adc3949ba59abbe56e057f20f883e', '', 0.00, '2020-02-05 15:10:58.000000', 1, '2020-02-22 22:21:58.000000', 0);
 INSERT INTO `userinfo` VALUES ('1582345810', 'JULY', 1, NULL, NULL, '17759501371', NULL, NULL, 'f607160448e19e0665bdbeb970c709c4', NULL, 0.00, '2020-02-22 10:59:24.000000', 2, NULL, 0);
 COMMIT;
 

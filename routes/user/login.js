@@ -6,7 +6,9 @@ const time = require('../../util/time')
 let tokens = new token()
 const regs = require('../../util/reg')
 const reg = new regs()
-let app = express()
+const img = require('../../util/img')
+const app = express();
+const imgutil = new img()
 
 async function existUser(phone) {
     let sql = `select count(1) as count from userinfo where phone = '${phone}'`
@@ -129,7 +131,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
                     name: d.name,
                     phone: d.phone,
                     birth: d.birthday,
-                    headimg: d.headimg === null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${d.headimg}`,
+                    headimg: d.headimg == '' ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${d.headimg}`,
                     isname: { 1: true, 2: false }[d.isname]
                 }
                 res.json({
@@ -146,7 +148,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
             })
     } else {
         res.json({
-            code: 600,
+            code: 601,
             message: '不存在此用户'
         })
     }

@@ -473,4 +473,24 @@ app.use('/GETSTOCK',(req,res,next)=>{
     })
 })
 
+app.use('/GETSALE',(req,res,next)=>{
+  let sql = `select *,count(o.shop_id) as count,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from order_shop o,shopinfo s WHERE o.shop_id = s.shop_id ORDER BY count DESC limit 0,3`
+  let result = []
+  mysql(sql)
+  .then(data=>{
+    data = JSON.parse(JSON.stringify(data))
+    result.push(...data)
+    let nsql = `select * ,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from shopinfo s left JOIN order_shop o on s.shop_id = o.shop_id where o.shop_id is null LIMIT 0,${3-data.length}`
+    mysql(nsql)
+    .then(ds => {
+       ds = JSON.parse(JSON.stringify(ds))
+       result.push(...ds) 
+       res.json({
+        code: 200,
+        info: result
+      })
+    })
+})
+})
+
 module.exports = app

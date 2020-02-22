@@ -21,7 +21,7 @@ app.use('/GETAD', (req, res, next) => {
         2: 'adid = 2 and s.shop_id = a.shopid',
         undefined: '1'
     }[adid]
-    let sql = `SELECT a.id,a.res,a.adimg,s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}') and isshow = 0 and ${a} group by id`
+    let sql = `SELECT a.id,a.res,a.adimg,s.shop_id as shopid, s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}') and isshow = 0 and ${a} group by id`
     mysql(sql)
         .then(data => {
             data = JSON.parse(JSON.stringify(data))
@@ -31,6 +31,7 @@ app.use('/GETAD', (req, res, next) => {
               id: el.id,
               adimg: imgutil.imgtobase(`./public${el.adimg}`),
               shopname:el.shopname,
+              shopid:el.shopid,
               shopdes:el.res
             }
             result.push(da)
