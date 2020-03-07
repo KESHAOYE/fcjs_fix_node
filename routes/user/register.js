@@ -138,29 +138,29 @@ app.use('/FULLINFO', async(req, res, next) => {
     } else {
         let head =''
         if(headimg.indexOf('default')==-1){
-         let head = headimg != '' ? imgs.saveImg('./public/userHead/', headimg) : ''
-        if (head == 'Error: 您上传的不是图片') {
+          let head = headimg != '' ? imgs.saveImg('/userHead/', headimg) : ''
+          if (head == 'Error: 您上传的不是图片') {
             res.json({
                 code: 600,
                 message: '您上传的不是图片'
             })
-            return
+         } else {
+            let sexs = { '男': 1, '女': 2 }[sex]
+            let sql = `update userinfo set id = '${id}', birthday = '${time.getTime(birth)}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
+            mysql(sql).then(data => {
+                    res.json({
+                        code: 200,
+                        message: '已完善'
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: '发生错误'
+                    })
+                })
          }
-       }
-        let sexs = { '男': 1, '女': 2 }[sex]
-        let sql = `update userinfo set id = '${id}', birthday = '${time.getTime(birth)}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
-        mysql(sql).then(data => {
-                res.json({
-                    code: 200,
-                    message: '已完善'
-                })
-            })
-            .catch(err => {
-                res.json({
-                    code: 600,
-                    message: '发生错误'
-                })
-            })
+        }
     }
 })
 

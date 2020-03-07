@@ -48,9 +48,9 @@ app.use('/GETSHOPS', (req, res, next) => {
     let start = (page - 1) * pageSize
     let sql = `
     select s.shop_id,shopname,s.shopdes,sort.sortid,brand.brandid,sort.sortname,a.article_content,brand.brandname,s.isold,s.old_type,GROUP_CONCAT(si.imgid,':',si.path) as imgs from article_info a,shopinfo s,sortinfo sort,brandinfo 
-    brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.delete = 0  ${query} group by s.shop_id limit ${start},${pageSize*page};
+    brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.deletes = 0  ${query} group by s.shop_id limit ${start},${pageSize*page};
     select s.shop_id,GROUP_CONCAT(ss.spec_name,':',ssv.spec_value) as spuinfo from shopinfo s,shop_spec ss,shop_spu_spec sps,shop_spec_value ssv WHERE  sps.shop_id = s.shop_id and ssv.spu_id = sps.spu_id and sps.spec_id = ssv.spec_id and sps.spec_id = ss.spec_id  group by shop_id;
-    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.delete = 0 GROUP BY sks.sku_id;`
+    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.deletes = 0 GROUP BY sks.sku_id;`
     let sq = `select count(*) as count from shopinfo`
     mysql(sql)
         .then(a => {
@@ -153,10 +153,10 @@ app.use('/GETSHOPBYID', (req, res, next) => {
         shopid
     } = req.body
     let sql = `
-    select s.shop_id,s.price,shopname,s.shopdes,sort.sortid,brand.brandid,sort.sortname,brand.brandname,brand.brandename,a.article_content,s.isold,s.old_type,si.path from article_info a,shopinfo s,sortinfo sort,brandinfo brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.delete = 0 and s.shop_id = '${shopid}' ;
+    select s.shop_id,s.price,shopname,s.shopdes,sort.sortid,brand.brandid,sort.sortname,brand.brandname,brand.brandename,a.article_content,s.isold,s.old_type,si.path from article_info a,shopinfo s,sortinfo sort,brandinfo brand,shopimg si where s.brandid = brand.brandid and s.shopsort = sort.sortid  and si.shopid = s.shop_id and a.shopid = s.shop_id and s.deletes = 0 and s.shop_id = '${shopid}' ;
     select s.shop_id,ss.spec_name,ss.spec_id,ssv.spec_value from shopinfo s,shop_spec ss,shop_spu_spec sps,shop_spec_value ssv WHERE s.shop_id = sps.shop_id and 
-    ss.spec_id = ssv.spec_id and ss.spec_id = sps.spec_id and s.delete = 0 and sps.spu_id = ssv.spu_id and s.shop_id = '${shopid}';
-    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.delete = 0 and s.shop_id = '${shopid}' GROUP BY sks.sku_id;
+    ss.spec_id = ssv.spec_id and ss.spec_id = sps.spec_id and s.deletes = 0 and sps.spu_id = ssv.spu_id and s.shop_id = '${shopid}';
+    select s.shop_id,ss.spec_name,sskv.sku_value,sks.stock, sks.price ,sks.sku_id,sskv.spec_id from shopinfo s,shop_spec ss,shop_sku_spec sks,shop_sku_spec_value sskv WHERE s.shop_id = sks.shop_id and ss.spec_id = sskv.spec_id and sskv.sku_id = sks.sku_id and s.deletes = 0 and s.shop_id = '${shopid}' GROUP BY sks.sku_id;
     select count(*) as count from order_shop where shop_id = '${shopid}';`
     mysql(sql)
         .then(a => {
@@ -274,15 +274,12 @@ function addshopimg(shopid, a, ct) {
 }
 
 function addskpu(type, shopid, val, ct) {
-    // val.replace('[','')
-    // val.replace(']','')
     if (Array.prototype.isPrototypeOf(val) == true)
         return new Promise((resolve, reject) => {
             for (let i = 0; i < val.length; i++) {
                 let sku_id = uuid.v1()
-                let sql = type == 'SPU' ? `insert into shop_spec_value(spu_id,spec_id,spec_value,createTime) values('${sku_id}','${val[i].spec_id}','${val[i].spec_value}','${ct}');
-    insert into shop_spu_spec(shop_id,spec_id,spu_id,createTime) values('${shopid}','${val[i].spec_id}','${sku_id}','${ct}');` : `insert into shop_sku_spec_value(spec_id,sku_id,sku_value,createTime) values('${val[i].spec_id}','${sku_id}','${val[i].spec_value}','${ct}');
-    insert into shop_sku_spec(shop_id,sku_id,price,stock) values('${shopid}','${sku_id}','${val[i].price}','${0}')`
+                let sql = type == 'SPU' ? `insert into shop_spu_spec(shop_id,spec_id,spu_id,createTime) values('${shopid}','${val[i].spec_id}','${sku_id}','${ct}');insert into shop_spec_value(spu_id,spec_id,spec_value,createTime) values('${sku_id}','${val[i].spec_id}','${val[i].spec_value}','${ct}');
+    ` : `insert into shop_sku_spec(shop_id,sku_id,price,stock) values('${shopid}','${sku_id}','${val[i].price}','${0}');insert into shop_sku_spec_value(spec_id,sku_id,sku_value,createTime) values('${val[i].spec_id}','${sku_id}','${val[i].spec_value}','${ct}');`
                 mysql(sql)
                     .then(data => {})
                     .catch(err => {
@@ -433,7 +430,7 @@ app.use('/DELETESHOP', (req, res, next) => {
     let t = tokens.checkAdminToken(phone, _t_, roleid)
     const ct = time.getTime()
     t.then(data => {
-            let sql = `update shopinfo set delete = '1' where shop_id = '${shopid}'`
+            let sql = `update shopinfo set deletes = '1' where shop_id = '${shopid}'`
             mysql(sql)
                 .then(data => {
                     res.json({
@@ -474,13 +471,13 @@ app.use('/GETSTOCK',(req,res,next)=>{
 })
 
 app.use('/GETSALE',(req,res,next)=>{
-  let sql = `select *,count(o.shop_id) as count,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from order_shop o,shopinfo s WHERE o.shop_id = s.shop_id ORDER BY count DESC limit 0,3`
+  let sql = `select *,s.shop_id as shopid,count(o.shop_id) as count,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from order_shop o,shopinfo s WHERE o.shop_id = s.shop_id ORDER BY count DESC limit 0,3`
   let result = []
   mysql(sql)
   .then(data=>{
     data = JSON.parse(JSON.stringify(data))
     result.push(...data)
-    let nsql = `select * ,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from shopinfo s left JOIN order_shop o on s.shop_id = o.shop_id where o.shop_id is null LIMIT 0,${3-data.length}`
+    let nsql = `select * ,s.shop_id as shopid,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from shopinfo s left JOIN order_shop o on s.shop_id = o.shop_id where s.deletes = 0 and o.shop_id is null LIMIT 0,${3-data.length}`
     mysql(nsql)
     .then(ds => {
        ds = JSON.parse(JSON.stringify(ds))

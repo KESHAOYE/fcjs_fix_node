@@ -21,7 +21,7 @@ app.use('/GETAD', (req, res, next) => {
         2: 'adid = 2 and s.shop_id = a.shopid',
         undefined: '1'
     }[adid]
-    let sql = `SELECT a.id,a.res,a.adimg,s.shop_id as shopid, s.shopname FROM adinfo a,shopinfo s where DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}') and isshow = 0 and ${a} group by id`
+    let sql = `SELECT a.id,a.res,a.adimg,s.shop_id as shopid, s.shopname,s.price FROM adinfo a,shopinfo s where DATE(startdue) <= DATE('${time.getTime()}') and DATE(overdue)>=DATE('${time.getTime()}') and isshow = 0 and ${a} group by id`
     mysql(sql)
         .then(data => {
             data = JSON.parse(JSON.stringify(data))
@@ -29,10 +29,11 @@ app.use('/GETAD', (req, res, next) => {
             data.forEach(el=>{
             const da={
               id: el.id,
-              adimg: imgutil.imgtobase(`./public${el.adimg}`),
+              adimg: `http://localhost:3000${el.adimg}`,
               shopname:el.shopname,
               shopid:el.shopid,
-              shopdes:el.res
+              shopdes:el.res,
+              price: el.price
             }
             result.push(da)
         })
@@ -138,7 +139,7 @@ app.use('/DELETEAD', (req, res, next) => {
     let phone = req.headers.phone
     let t = tokens.checkAdminToken(phone, _t_,roleid)
     t.then(data => {
-            let sql = `update adinfo set isshow = ${0} where id = '${id}'`
+            let sql = `update adinfo set isshow = 1 where id = '${id}'`
             mysql(sql).then(data => {
                     res.json({
                         code: 200,
@@ -164,7 +165,7 @@ app.use('/GETADBYID',(req,res,next)=>{
     let sql = `select *,s.shopname from adinfo a,shopinfo s where a.id = '${id}' and a.shopid =  s.shop_id `
     mysql(sql).then(data => {
         data = JSON.parse(JSON.stringify(data))[0]
-        data.adimg=imgutil.imgtobase(`./public${data.adimg}`)
+        data.adimg=`http://localhost:3000${data.adimg}`
         res.json({
             code: 200,
             info:data
@@ -195,8 +196,8 @@ app.use('/GETADS',(req,res,next)=>{
         undefined: '1'
     }[adid]
     let start = (page-1)*pageSize
-    let sql = `select id,adid,res,s.shopname,adimg,startdue,overdue,isshow from adinfo a,shopinfo s where ${s} and ${a} group by id  order by isshow desc limit ${start},${pageSize}`
-    let sq = `select count(*) as count from adinfo a,shopinfo s where ${s} and ${a}`
+    let sql = `select id,adid,res,s.shopname,adimg,s.price,startdue,overdue,isshow from adinfo a,shopinfo s where ${s} and ${a} and isshow = 0 group by id  order by isshow desc limit ${start},${pageSize}`
+    let sq = `select count(*) as count from adinfo a where ${s} and ${a} and isshow = 0 group by id`
     mysql(sql)
     .then(da=>{
         mysql(sq).then(data=>{

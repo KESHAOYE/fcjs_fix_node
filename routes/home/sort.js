@@ -12,7 +12,7 @@ const imgutil = new img()
 app.use('/GETSORT', (req, res, next) => {
     let sql = `select * from sortinfo 
     left join shopinfo on sortinfo.sortid = shopinfo.shopsort 
-    left join (select * from shopimg group by shopid) as b on b.shopid = shopinfo.shop_id`
+    left join (select * from shopimg group by shopid) as b on b.shopid = shopinfo.shop_id where shopinfo.deletes = 0`
     let result = []
     mysql(sql)
         .then(data => {

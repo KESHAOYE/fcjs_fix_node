@@ -123,6 +123,7 @@ app.use('/GETUSERINFO', async(req, res, next) => {
         mysql(sql)
             .then(data => {
                 let d = data[0]
+                console.log(d.headimg)
                 const result = {
                     userid: d.user_id,
                     username: d.username,

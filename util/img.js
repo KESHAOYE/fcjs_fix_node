@@ -18,7 +18,7 @@ class img {
      */
     basetoimg(string) {
         var base64Data = string.replace(/^data:image\/\w+;base64,/, "");
-        var dataBuffer = new Buffer(base64Data, 'base64');
+        var dataBuffer = new Buffer.from(base64Data, 'base64');
         return dataBuffer
     }
     imgtobase(path) {
@@ -59,6 +59,7 @@ class img {
         if (this.isImg(string)) {
             fs.writeFile(path + el, this.basetoimg(string), (err) => {
                 if (err) {
+                    console.log(err)
                     return new Error(err)
                 }
             })

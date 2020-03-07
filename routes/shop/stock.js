@@ -10,9 +10,12 @@ const imgutil = new img()
 
 app.use('/GETSTOCKBYID', (req, res, next) => {
     let {
-        shopid
+        shopid,
+        page,
+        pageSize
     } = req.body
-    let sql = `select * from sku_stock where shop_id = '${shopid}'`
+    let start = (page - 1) * pageSize
+    let sql = `select * from sku_stock where shop_id = '${shopid}' limit ${start}, ${page * pageSize}`
     let sq = `select count(*) as count from sku_stock where shop_id = '${shopid}'`
     mysql(sql)
         .then(da => {
@@ -89,7 +92,6 @@ app.use('/ADDSTOCK', (req, res, next) => {
     let t = tokens.checkAdminToken(phone, _t_, roleid)
     t.then(data => {
         dealsku(sku, shopid).then(data => {
-            console.log(data);
             let sql = `insert into sku_stock(shop_id,price,stock,sku_concat) values('${shopid}','${data.price}','${stock}','${JSON.stringify(data.info)}')`
             mysql(sql)
                 .then(data => {

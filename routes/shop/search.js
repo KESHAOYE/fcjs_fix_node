@@ -86,7 +86,7 @@ app.use('/SEARCHRESULT',(req,res,next)=>{
       'so.sortename': `'${sort&&sort.toUpperCase()}' and so.sortid = s.shopsort`,
       'isold': `'${isold}'`,
       'old_type': `'${oldtype}'`,
-      'price': `'${min_price}' and price < '${max_price}'`
+      'price': `'${max_price}' and price < '${min_price}'`
     }
     qdata = queryString(qdata)
     let sql = `select s.shop_id,s.shopname,s.isold,s.price,(select path from shopimg si where si.shopid = s.shop_id limit 1) as shopimg,s.price from shopinfo s,shopimg si,sortinfo so where ${qdata} group by s.shop_id`

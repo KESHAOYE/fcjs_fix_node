@@ -44,7 +44,8 @@ app.use('/GETCOMMENT', (req, res, next) => {
     .then(data => {
       data = JSON.parse(JSON.stringify(data))
       data.forEach((el, index) => {
-        data[index].headimg = data[index].headimg == null ? 'http://localhost:3000/userHead/default.png' : data[index].headimg
+        console.log(data[index])
+        data[index].headimg = data[index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[0][index].headimg}`
         if (data[index].comment_img.length > 0 && data[index].comment_img != 'undefined'){
           data[index].comment_img = data[index].comment_img.replace(/data:image\/jpeg;base64,/g, '')
         data[index].comment_img = data[index].comment_img.split(',')
@@ -88,7 +89,8 @@ app.use('/GETFIRST', (req, res, next) => {
     .then(data => {
       data = JSON.parse(JSON.stringify(data))
       data[0].forEach((el, index) => {
-        data[0][index].headimg = data[0][index].headimg == null ? 'http://localhost:3000/userHead/default.png' : data[0][index].headimg
+        console.log(data[0][index].headimg);
+        data[0][index].headimg = data[0][index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[0][index].headimg}`
         if (data[0][index].comment_img.length > 0)
           data[0][index].comment_img = data[0][index].comment_img.replace(/data:image\/jpeg;base64,/g, '')
           data[0][index].comment_img = data[0][index].comment_img.split(',')

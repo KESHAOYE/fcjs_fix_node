@@ -74,12 +74,12 @@ app.use('/GETORDERCOUNT', (req, res, next) => {
   let phone = req.headers.phone
   let t = tokens.checkToken(phone, _t_)
   t.then(data => {
-      let sql = `select count(*) as waitpay from orderinfo where user_id = '${phone}' and order_state = '1';
-  select count(*) as waitfix from orderinfo where user_id = '${phone}' and order_state = '2';
-  select count(*) as fixing from orderinfo where user_id = '${phone}' and order_state = '3';
-  select count(*) as waitsend from orderinfo where user_id = '${phone}' and order_state = '41' or order_state = '42';
-  select count(*) as waitreceive from orderinfo where user_id = '${phone}' and order_state = '5';
-  select count(*) as waitcomment from orderinfo where user_id = '${phone}' and order_state = '6';`
+      let sql = `select count(*) as waitpay from orderinfo where user_id = '${phone}' and order_state = '1' and isshow = 0;
+  select count(*) as waitfix from orderinfo where user_id = '${phone}' and order_state = '2' and isshow = 0;
+  select count(*) as fixing from orderinfo where user_id = '${phone}' and order_state = '3' and isshow = 0;
+  select count(*) as waitsend from orderinfo where user_id = '${phone}' and order_state = '41' or order_state = '42' and isshow = 0;
+  select count(*) as waitreceive from orderinfo where user_id = '${phone}' and order_state = '5' and isshow = 0;
+  select count(*) as waitcomment from orderinfo where user_id = '${phone}' and order_state = '6' and isshow = 0;`
       mysql(sql)
         .then(data => {
           data = JSON.parse(JSON.stringify(data))
@@ -295,7 +295,7 @@ app.use('/DELETEORDER', (req, res, next) => {
     })
 })
 
-// 获取订单 缩略信息
+// 获取订单 简略信息
 app.use('/GETCENTERORDERINFO', (req, res, next) => {
   let {
     userid,
@@ -305,7 +305,7 @@ app.use('/GETCENTERORDERINFO', (req, res, next) => {
   } = req.body
   let start = (page - 1) * pageSize
   let fixsql = userid == 'all' ? `select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id limit ${start},${pageSize * page};` : ` select o.order_id,order_date,order_state,o.order_type,order_money,fm.model_img as shopimg,model_name as shopname,(select count(*) as count from fixorderitem os where os.order_id = o.order_id)as itemcount,(select name from address_info a where a.addressid = o.addressid) as name from model_item m,orderinfo o,fixorderitem fi,fixmodel fm where o.user_id = (select phone from userinfo u where u.user_id = '${userid}') and fi.model_id=m.model_id and fi.item_id = m.item_id and fi.order_id= o.order_id and o.order_state >0 and o.isshow = 0 and fm.model_id=fi.model_id group by o.order_id and o.order_state ${type} limit ${start},${pageSize * page}`
-  let s = `select count(*) as count from orderinfo o where o.order_state ${type}`
+  let s = `select count(*) as count from orderinfo o where o.order_state ${type} and isshow = 0`
   let result = []
   mysql(fixsql)
     .then(data => {

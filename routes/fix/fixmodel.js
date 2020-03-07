@@ -154,7 +154,6 @@ app.use('/UPDATEMODEL', (req, res, next) => {
         model_img,
         fixitem
     } = req.body
-    console.log(fixitem);
     let _t_ = req.headers.authorization
     let roleid = req.headers.roleid
     let phone = req.headers.phone
