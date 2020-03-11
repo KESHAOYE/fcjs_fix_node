@@ -8,8 +8,13 @@ const uuid = require('node-uuid')
 const img = require('../../util/img')
 const imgutil = new img()
 
-app.use('/ADDSHOPCAR',(req,res,next)=>{
-    let {userid,shopid,sku_id,count} = req.body
+app.use('/ADDSHOPCAR', (req, res, next) => {
+    let {
+        userid,
+        shopid,
+        sku_id,
+        count
+    } = req.body
     let sql = `DROP PROCEDURE IF EXISTS addshopcar;
     CREATE PROCEDURE addshopcar(
      IN shop_id VARCHAR(255),
@@ -30,58 +35,64 @@ app.use('/ADDSHOPCAR',(req,res,next)=>{
     END;
     call addshopcar('${shopid}','${sku_id}','${userid}','${count}')`
     mysql(sql)
-    .then(data=>{
-        res.json({
-            code: 200,
-            message: '添加成功'
+        .then(data => {
+            res.json({
+                code: 200,
+                message: '添加成功'
+            })
         })
-    })
-    .catch(err=>{
-        res.json({
-            code: 600,
-            message: '添加失败'+err
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: '添加失败' + err
+            })
         })
-    })
 })
 
-app.use('/GETSHOPCAR',(req,res,next)=>{
-    let {userid} = req.body
+app.use('/GETSHOPCAR', (req, res, next) => {
+    let {
+        userid
+    } = req.body
     let sql = `select sc.id,sm.path as shopimg,si.shop_id as shopid,ss.id as sku_id,sc.count,si.shopname,ss.sku_concat as sku_name,sc.price,ss.price as per_price from shopcar sc,shopinfo si,shopimg sm,sku_stock ss where sc.userid= '${userid}' and sc.shopid = si.shop_id and sm.shopid = si.shop_id and ss.id = sc.sku_id and sc.state = 0 GROUP BY id `
     mysql(sql)
-    .then(data=>{
-        data = JSON.parse(JSON.stringify(data))
-        data.forEach((el,index)=>{
-            data[index].shopimg = imgutil.imgtobase(`./public${el.shopimg}`)
+        .then(data => {
+            data = JSON.parse(JSON.stringify(data))
+            data.forEach((el, index) => {
+                data[index].shopimg = imgutil.imgtobase(`./public${el.shopimg}`)
+            })
+            res.json({
+                code: 200,
+                info: data
+            })
         })
-       res.json({
-         code: 200,
-         info: data
-       }) 
-    })
-    .catch(err=>{
-        res.json({
-            code: 600,
-            message: '获取失败'
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: '获取失败'
+            })
         })
-    })
 })
 
-app.use('/DELETESHOPCAR',(req,res,next)=>{
-    let {userid,shopid,sku_id} = req.body
+app.use('/DELETESHOPCAR', (req, res, next) => {
+    let {
+        userid,
+        shopid,
+        sku_id
+    } = req.body
     let sql = `UPDATE shopcar s SET s.state = 2 where userid = '${userid}' and shopid = '${shopid}' and sku_id = '${sku_id}';`
     mysql(sql)
-    .then(data=>{
-        res.json({
-            code: 200,
-            message: '成功'
+        .then(data => {
+            res.json({
+                code: 200,
+                message: '成功'
+            })
         })
-    })
-    .catch(err=>{
-        res.json({
-            code: 600,
-            message: '失败'
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: '失败'
+            })
         })
-    })
 })
 
 module.exports = app;

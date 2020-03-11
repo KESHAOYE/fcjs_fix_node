@@ -1,10 +1,10 @@
 const express = require('express')
 const mysql = require('../../util/db')
-    // 加密
+// 加密
 var utility = require("utility");
 // 时间获取
 const time = require('../../util/time')
-    // 图片处理
+// 图片处理
 const img = require('../../util/img')
 const imgs = new img()
 const regs = require('../../util/reg')
@@ -33,7 +33,7 @@ async function existId(id, phone) {
     }
 }
 // 注册
-app.use('/REGISTERNEW', async(req, res, next) => {
+app.use('/REGISTERNEW', async (req, res, next) => {
     let {
         name,
         phone,
@@ -100,8 +100,16 @@ app.use('/REGISTERNEW', async(req, res, next) => {
 })
 
 // 资料补齐
-app.use('/FULLINFO', async(req, res, next) => {
-    let { userid, phone, id, name, birth, sex, headimg } = req.body
+app.use('/FULLINFO', async (req, res, next) => {
+    let {
+        userid,
+        phone,
+        id,
+        name,
+        birth,
+        sex,
+        headimg
+    } = req.body
     reg.checkphonenumber(phone, data => {
         if (data) {
             res.json({
@@ -136,37 +144,43 @@ app.use('/FULLINFO', async(req, res, next) => {
             message: '不存在该用户，无法修改信息'
         })
     } else {
-        let head =''
-        if(headimg.indexOf('default')==-1){
-          let head = headimg != '' ? imgs.saveImg('/userHead/', headimg) : ''
-          if (head == 'Error: 您上传的不是图片') {
-            res.json({
-                code: 600,
-                message: '您上传的不是图片'
-            })
-         } else {
-            let sexs = { '男': 1, '女': 2 }[sex]
-            let sql = `update userinfo set id = '${id}', birthday = '${time.getTime(birth)}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
-            mysql(sql).then(data => {
-                    res.json({
-                        code: 200,
-                        message: '已完善'
-                    })
+        let head = ''
+        if (headimg.indexOf('default') == -1) {
+            let head = headimg != '' ? imgs.saveImg('/userHead/', headimg) : ''
+            if (head == 'Error: 您上传的不是图片') {
+                res.json({
+                    code: 600,
+                    message: '您上传的不是图片'
                 })
-                .catch(err => {
-                    res.json({
-                        code: 600,
-                        message: '发生错误'
+            } else {
+                let sexs = {
+                    '男': 1,
+                    '女': 2
+                } [sex]
+                let sql = `update userinfo set id = '${id}', birthday = '${time.getTime(birth)}', name = '${name}', sex = '${sexs}', isname = '1', nametime = '${time.getTime()}', headimg = '${head}' where user_id = ${userid}`
+                mysql(sql).then(data => {
+                        res.json({
+                            code: 200,
+                            message: '已完善'
+                        })
                     })
-                })
-         }
+                    .catch(err => {
+                        res.json({
+                            code: 600,
+                            message: '发生错误'
+                        })
+                    })
+            }
         }
     }
 })
 
-app.use('/CHANGEPASSWORD',(req,res,next)=>{
-  let { password,userid } = req.body
-  let _t_ = req.headers.authorization
+app.use('/CHANGEPASSWORD', (req, res, next) => {
+    let {
+        password,
+        userid
+    } = req.body
+    let _t_ = req.headers.authorization
     let phone = req.headers.phone
     let t = tokens.checkToken(phone, _t_)
     reg.checkpassword(password, (data) => {
@@ -180,26 +194,26 @@ app.use('/CHANGEPASSWORD',(req,res,next)=>{
     })
     let passwords = utility.md5(password)
     t.then(data => {
-      let sql = `update userinfo set password = '${passwords}' where user_id = '${userid}'`
-      mysql(sql).then(data => {
-        res.json({
-            code: 200,
-            message: '已修改'
+            let sql = `update userinfo set password = '${passwords}' where user_id = '${userid}'`
+            mysql(sql).then(data => {
+                    res.json({
+                        code: 200,
+                        message: '已修改'
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: '发生错误'
+                    })
+                })
         })
-    })
-    .catch(err => {
-        res.json({
-            code: 600,
-            message: '发生错误'
+        .catch(err => {
+            res.json({
+                code: 601,
+                message: '你没有权限'
+            })
         })
-    })
-    })
-    .catch(err => {
-        res.json({
-            code: 601,
-            message: '你没有权限'
-        })
-    })
 })
 
 module.exports = app

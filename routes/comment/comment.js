@@ -44,21 +44,15 @@ app.use('/GETCOMMENT', (req, res, next) => {
     .then(data => {
       data = JSON.parse(JSON.stringify(data))
       data.forEach((el, index) => {
-        console.log(data[index])
-        data[index].headimg = data[index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[0][index].headimg}`
-        if (data[index].comment_img.length > 0 && data[index].comment_img != 'undefined'){
-          data[index].comment_img = data[index].comment_img.replace(/data:image\/jpeg;base64,/g, '')
-        data[index].comment_img = data[index].comment_img.split(',')
-        data[index].comment_img.forEach((el, indexs) => {
-          console.log(el == '');
-          if (el == "") {
-            data[index].comment_img.splice(indexs, 1)
-          } else {
-            data[index].comment_img[indexs] = 'data:image/jpeg;base64,' + el
-          }
+        data[index].headimg = data[index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[index].headimg}`
+        if (data[index].comment_img.length > 0 && data[index].comment_img != 'undefined'){  
+            console.log(data[index].comment_img);
+            data[index].comment_img = data[index].comment_img.split(",")
+            data[index].comment_img.forEach((el,indexs)=>{
+            data[index].comment_img[indexs] =  `http://localhost:3000${data[index].comment_img[indexs]}`
         })
-      }
-      })
+       }
+    })
 
       res.json({
         code: 200,
@@ -66,6 +60,7 @@ app.use('/GETCOMMENT', (req, res, next) => {
       })
     })
     .catch(err => {
+      console.log(err)
       res.json({
         code: 600,
         message: err
@@ -89,17 +84,11 @@ app.use('/GETFIRST', (req, res, next) => {
     .then(data => {
       data = JSON.parse(JSON.stringify(data))
       data[0].forEach((el, index) => {
-        console.log(data[0][index].headimg);
-        data[0][index].headimg = data[0][index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[0][index].headimg}`
-        if (data[0][index].comment_img.length > 0)
-          data[0][index].comment_img = data[0][index].comment_img.replace(/data:image\/jpeg;base64,/g, '')
-          data[0][index].comment_img = data[0][index].comment_img.split(',')
-          data[0][index].comment_img.forEach((el, indexs) => {
-          if (el == "") {
-            data[0][index].comment_img.splice(indexs, 1)
-          } else {
-            data[0][index].comment_img[indexs] = 'data:image/jpeg;base64,' + el
-          }
+        data[0][index].headimg = data[0][index].headimg == null ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${data[0][index].headimg}`  
+        console.log(data[0][index]);
+        data[0][index].comment_img = data[0][index].comment_img.split(",")
+        data[0][index].comment_img.forEach((el,indexs)=>{
+          data[0][index].comment_img[indexs] =  `http://localhost:3000/${data[0][index].comment_img[indexs]}`
         })
       })
       const da = {
@@ -128,11 +117,11 @@ app.use('/ADDCOMMENT', (req, res, next) => {
   let t = tokens.checkToken(phone, _t_)
   t.then(data => {
     let sql = ''
-    for (let i = 0; i < info.length; i++) {
-      sql += `INSERT INTO comment_info(shopid, sku_id, comment, userid, comment_time, score,comment_img) VALUES ('${info[i].shop_id}', ${info[i].sku_id}, '${info[i].content}', '${userid}', '${time.getTime()}',${info[i].rate} ,'${info[i].shopimg}');
-      `
-    }
-    sql += `update orderinfo o set o.order_state = 7 where o.order_id = '${orderid}';
+      for(let i= 0;i<info[0].shopimg.length;i++){
+       info[0].shopimg[i] = imgutil.saveImg('/comment/',info[0].shopimg[i])
+      }
+    sql = `INSERT INTO comment_info(shopid, sku_id, comment, userid, comment_time, score,comment_img) VALUES ('${info[0].shop_id}', ${info[0].sku_id}, '${info[0].content}', '${userid}', '${time.getTime()}',${info[0].rate} ,'${info[0].shopimg}');
+     update orderinfo o set o.order_state = 7 where o.order_id = '${orderid}';
     insert into order_state(order_id,now_state,createTime) values('${orderid}','7','${time.getTime()}');
     `
     mysql(sql)

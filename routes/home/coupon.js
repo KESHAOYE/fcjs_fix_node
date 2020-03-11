@@ -56,10 +56,12 @@ app.use('/GETCOUPONBYSORT', (req, res, next) => {
         })
 })
 
-app.use('/GETCOUPONS',(req,res,next)=>{
-  let {count} = req.body
-  let sql = `select * from coupon where isshow = 0 and DATE(over_time) >= '${time.getTime()}' and get_date >= '${time.getTime()}' limit 0,${count}`
-  mysql(sql)
+app.use('/GETCOUPONS', (req, res, next) => {
+    let {
+        count
+    } = req.body
+    let sql = `select * from coupon where isshow = 0 and DATE(over_time) >= '${time.getTime()}' and get_date >= '${time.getTime()}' limit 0,${count}`
+    mysql(sql)
         .then(data => {
             res.json({
                 code: 200,

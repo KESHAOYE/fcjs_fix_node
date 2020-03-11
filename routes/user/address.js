@@ -70,13 +70,13 @@ app.use('/GETADDRESSBYID', (req, res, next) => {
     mysql(sql)
         .then(data => {
             res.json({
-               code: 200,
-               info:data
+                code: 200,
+                info: data
             })
         })
 })
 
-app.use('/UPDATEADDRESS',(req,res,next)=>{
+app.use('/UPDATEADDRESS', (req, res, next) => {
     let {
         userid,
         name,
@@ -113,7 +113,7 @@ app.use('/UPDATEADDRESS',(req,res,next)=>{
         })
 })
 
-app.use('/DELETEADDRESS',(req,res,next)=>{
+app.use('/DELETEADDRESS', (req, res, next) => {
     let {
         addressid
     } = req.body

@@ -89,7 +89,7 @@ app.use('/GETSHOPS', (req, res, next) => {
                     return el.shop_id == es.shop_id
                 })
                 if (index != -1) {
-                    el.spuinfo.split(',').forEach(et=>{
+                    el.spuinfo.split(',').forEach(et => {
                         let c = et.split(':')
                         const data = {
                             specName: c[0],
@@ -207,7 +207,7 @@ app.use('/GETSHOPBYID', (req, res, next) => {
                 })
                 if (index != -1) {
                     const data = {
-                        spec_id:el.spec_id,
+                        spec_id: el.spec_id,
                         spec_name: el.spec_name,
                         spec_value: el.spec_value
                     }
@@ -278,7 +278,7 @@ function addskpu(type, shopid, val, ct) {
         return new Promise((resolve, reject) => {
             for (let i = 0; i < val.length; i++) {
                 let sku_id = uuid.v1()
-                let sql = type == 'SPU' ? `insert into shop_spu_spec(shop_id,spec_id,spu_id,createTime) values('${shopid}','${val[i].spec_id}','${sku_id}','${ct}');insert into shop_spec_value(spu_id,spec_id,spec_value,createTime) values('${sku_id}','${val[i].spec_id}','${val[i].spec_value}','${ct}');
+                let sql = type == 'SPU' ? `insert into shop_spec_value(spu_id,spec_id,spec_value,createTime) values('${sku_id}','${val[i].spec_id}','${val[i].spec_value}','${ct}');insert into shop_spu_spec(shop_id,spec_id,spu_id,createTime) values('${shopid}','${val[i].spec_id}','${sku_id}','${ct}');
     ` : `insert into shop_sku_spec(shop_id,sku_id,price,stock) values('${shopid}','${sku_id}','${val[i].price}','${0}');insert into shop_sku_spec_value(spec_id,sku_id,sku_value,createTime) values('${val[i].spec_id}','${sku_id}','${val[i].spec_value}','${ct}');`
                 mysql(sql)
                     .then(data => {})
@@ -342,9 +342,10 @@ app.use('/ADDSHOP', (req, res, next) => {
 function deletespec(shop_id) {
     return new Promise((resolve, reject) => {
         let sql = `
-        delete from shop_spec_value where spec_id = any(select spec_id from shop_spu_spec where shop_id = '${shop_id}');
         DELETE from shop_spu_spec where shop_id = '${shop_id}';
+        delete from shop_spec_value where spec_id = any(select spec_id from shop_spu_spec where shop_id = '${shop_id}');
         -- 删除sku
+        delete from shopcar where sku_id = any(SELECT id from shop_sku_spec where shop_id = '${shop_id}');
         delete from shop_sku_spec_value where sku_id = any(SELECT sku_id from shop_sku_spec where shop_id = '${shop_id}');
         DELETE from shop_sku_spec where shop_id = '${shop_id}';
         delete from sku_stock where shop_id = any(select shop_id from shopinfo where shop_id = '${shop_id}')`;
@@ -452,42 +453,44 @@ app.use('/DELETESHOP', (req, res, next) => {
             })
         })
 })
-app.use('/GETSTOCK',(req,res,next)=>{
-    let {shopid} = req.body
+app.use('/GETSTOCK', (req, res, next) => {
+    let {
+        shopid
+    } = req.body
     let sql = `select * from sku_stock where shop_id = '${shopid}'`
     mysql(sql)
-    .then(data=>{
-        res.json({
-          code: 200,
-          info:data
+        .then(data => {
+            res.json({
+                code: 200,
+                info: data
+            })
         })
-    })
-    .catch(err=>{
-        res.json({
-            code: 600,
-            message:err
+        .catch(err => {
+            res.json({
+                code: 600,
+                message: err
+            })
         })
-    })
 })
 
-app.use('/GETSALE',(req,res,next)=>{
-  let sql = `select *,s.shop_id as shopid,count(o.shop_id) as count,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from order_shop o,shopinfo s WHERE o.shop_id = s.shop_id ORDER BY count DESC limit 0,3`
-  let result = []
-  mysql(sql)
-  .then(data=>{
-    data = JSON.parse(JSON.stringify(data))
-    result.push(...data)
-    let nsql = `select * ,s.shop_id as shopid,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from shopinfo s left JOIN order_shop o on s.shop_id = o.shop_id where s.deletes = 0 and o.shop_id is null LIMIT 0,${3-data.length}`
-    mysql(nsql)
-    .then(ds => {
-       ds = JSON.parse(JSON.stringify(ds))
-       result.push(...ds) 
-       res.json({
-        code: 200,
-        info: result
-      })
-    })
-})
+app.use('/GETSALE', (req, res, next) => {
+    let sql = `select *,s.shop_id as shopid,count(o.shop_id) as count,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from order_shop o,shopinfo s WHERE o.shop_id = s.shop_id ORDER BY count DESC limit 0,3`
+    let result = []
+    mysql(sql)
+        .then(data => {
+            data = JSON.parse(JSON.stringify(data))
+            result.push(...data)
+            let nsql = `select * ,s.shop_id as shopid,(SELECT path from shopimg si where s.shop_id = si.shopid limit 0,1) as shopimg from shopinfo s left JOIN order_shop o on s.shop_id = o.shop_id where s.deletes = 0 and o.shop_id is null LIMIT 0,${3-data.length}`
+            mysql(nsql)
+                .then(ds => {
+                    ds = JSON.parse(JSON.stringify(ds))
+                    result.push(...ds)
+                    res.json({
+                        code: 200,
+                        info: result
+                    })
+                })
+        })
 })
 
 module.exports = app

@@ -60,8 +60,8 @@ app.use('/GETSORT', (req, res, next) => {
 app.use('/GETSORTS',(req,res,next)=>{
     let {sortname, page, pageSize} = req.body
     let start = (page-1)*pageSize
-  let sql = sortname == ''? `select * from sortinfo limit ${start},${pageSize*page}` : `select * from sortinfo where sortname like '%${sortname}%' or sortename like '%${sortname}%' limit ${start},${pageSize*page}`
-  let sq = sortname == ''? `select count(*) as count from sortinfo ` : `select count(*) as count from sortinfo where sortname like '%${sortname}%' or sortename like '%${sortname}%'`
+  let sql = sortname == ''? `select * from sortinfo where isshow =1 limit ${start},${pageSize*page}` : `select * from sortinfo where isshow =1 and (sortname like '%${sortname}%' or sortename like '%${sortname}%')  limit ${start},${pageSize*page}`
+  let sq = sortname == ''? `select count(*) as count from sortinfo where isshow =1 ` : `select count(*) as count from sortinfo where isshow =1 and (sortname like '%${sortname}%' or sortename like '%${sortname}%')`
     mysql(sql)
     .then(da=>{
         mysql(sq).then(data=>{

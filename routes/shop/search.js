@@ -15,7 +15,7 @@ app.use('/SEARCHLIST', (req, res, next) => {
         key,
         count
     } = req.body
-    let sql = `select s.shopname from shopinfo s where s.shopname like '%${key}%' limit 0,${count}`
+    let sql = `select s.shopname from shopinfo s where deletes = 0 and s.shopname like '%${key}%' limit 0,${count}`
     mysql(sql)
         .then(data => {
             let result = []
@@ -89,7 +89,7 @@ app.use('/SEARCHRESULT',(req,res,next)=>{
       'price': `'${max_price}' and price < '${min_price}'`
     }
     qdata = queryString(qdata)
-    let sql = `select s.shop_id,s.shopname,s.isold,s.price,(select path from shopimg si where si.shopid = s.shop_id limit 1) as shopimg,s.price from shopinfo s,shopimg si,sortinfo so where ${qdata} group by s.shop_id`
+    let sql = `select s.shop_id,s.shopname,s.isold,s.price,(select path from shopimg si where si.shopid = s.shop_id limit 1) as shopimg,s.price from shopinfo s,shopimg si,sortinfo so where deletes = 0 and ${qdata} group by s.shop_id`
     mysql(sql)
     .then(data=>{
       let result = [] 

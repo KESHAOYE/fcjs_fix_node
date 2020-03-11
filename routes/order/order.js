@@ -162,7 +162,7 @@ app.use('/GETORDERCOUPON', (req, res, next) => {
   uc.use_status = 0 and c.start_time < '${time.getTime()}' and c.over_time > '${time.getTime()}' and c.coupon_id = uc.coupon_id 
   and (c.coupon_id = any(select coupon_id from coupon_shop where shop_id = any(select shop_id from order_shop os where order_id = '${orderid}' 
   and c.min_price < os.price)) or c.coupon_id = any(select coupon_id from coupon_sort co where co.sort_id = any(select shopsort from shopinfo s,order_shop os where os.order_id = '${orderid}' 
-  and s.shop_id = os.shop_id and c.min_price < os.price)) or c.use_type =0) GROUP BY c.coupon_id;  `
+  and s.shop_id = os.shop_id and c.min_price <= os.price)) or c.use_type =0) GROUP BY c.coupon_id;  `
       mysql(sql)
         .then(data => {
           res.json({
@@ -353,6 +353,7 @@ app.use('/PAY', (req, res, next) => {
   } = req.body
   let _t_ = req.headers.authorization
   let phone = req.headers.phone
+  let types = type == 0 ? 41 : 2
   let t = tokens.checkToken(phone, _t_)
   t.then(data => {
       let sql = `drop PROCEDURE IF EXISTS payorder;
@@ -368,10 +369,10 @@ app.use('/PAY', (req, res, next) => {
   DECLARE order_price DECIMAL(10,2) default 0;
   select amount INTO coupon_amount from coupon c where c.coupon_id = coupon_id;
   select order_money into order_price from orderinfo o where o.order_id = order_id;
-  update orderinfo o set order_state = ${type},pay_id = pay_id, addressId = address_id,true_price = order_price - coupon_amount where o.order_id = order_id;
+  update orderinfo o set order_state = ${types},pay_id = pay_id, addressId = address_id,true_price = order_price - coupon_amount where o.order_id = order_id;
   update usercoupon set use_status = 1,use_time = '${time.getTime()}',order_id =order_id where user_id = user_id and coupon_id = coupon_id;
   insert into payinfo(user_id,order_id,count,paym_id,pay_bdate) VALUES(user_id,order_id,order_price - coupon_amount,pay_id,'${time.getTime()}');
-  INSERT into order_state(order_id,now_state,createTime) VALUES(order_id,${type},'${time.getTime()}');
+  INSERT into order_state(order_id,now_state,createTime) VALUES(order_id,${types},'${time.getTime()}');
   END;
   CALL payorder('${order_id}','${address_id}','${coupon_id}','${payid}','${user_id}')`
       mysql(sql)
@@ -458,10 +459,9 @@ app.use('/WAITFIX', (req, res, next) => {
   let t = tokens.checkAdminToken(phones, _t_, roleid)
   t.then(data => {
       let sql = `update orderinfo set order_state = 1 where order_id = '${orderid}';
-  update fixorder set man_price = '${man_price}',des = '${des}' where order_id = '${orderid}';
-  INSERT into order_state(order_id,now_state,createTime) VALUES('${orderid}',1,'${time.getTime()}');
-  select a.phone from address_info a ,orderinfo o where o.order_id = '${orderid}' and o.addressid = a.addressid;
-  `
+          update fixorder set man_price = '${man_price}',des = '${des}' where order_id = '${orderid}';
+          INSERT into order_state(order_id,now_state,createTime) VALUES('${orderid}',1,'${time.getTime()}');
+          select a.phone from address_info a ,orderinfo o where o.order_id = '${orderid}' and o.addressid = a.addressid;`
       mysql(sql)
         .then(data => {
           data = JSON.parse(JSON.stringify(data))
@@ -470,7 +470,7 @@ app.use('/WAITFIX', (req, res, next) => {
             userid: '7530',
             account: 'tebicom',
             password: 'tebicom123',
-            content: `【福城建设】: 尊敬的用户，您的需要维修的: ${phonename} ,订单已完成核验，最终价格为:￥${man_price}， 原因为:${des}，请及时前往订单中心付款或取消订单！`,
+            content: `【福城建设】: 尊敬的用户，您需要维修的: ${phonename} ,订单已完成核验，请及时前往订单中心付款或取消订单！`,
             mobile: data[3][0].phone
           })
           let option = {
@@ -606,9 +606,9 @@ app.use('/CONFIRM', (req, res, next) => {
   let phone = req.headers.phone
   let t = tokens.checkToken(phone, _t_)
   t.then(data => {
-    let sql = type == 0 ? `update orderinfo set order_state = 6 where order_id = '${orderid}';
-    insert into order_state(order_id,now_state,createTime) values('${orderid}','6','${time.getTime()}')`
-    : `update orderinfo set order_state = 7 where order_id = '${orderid}';
+      let sql = type == 0 ? `update orderinfo set order_state = 6 where order_id = '${orderid}';
+    insert into order_state(order_id,now_state,createTime) values('${orderid}','6','${time.getTime()}')` :
+        `update orderinfo set order_state = 7 where order_id = '${orderid}';
     insert into order_state(order_id,now_state,createTime) values('${orderid}','7','${time.getTime()}')`
       mysql(sql)
         .then(data => {
@@ -627,7 +627,7 @@ app.use('/CONFIRM', (req, res, next) => {
     .catch(err => {
       res.json({
         code: 601,
-        message: '你没有权限'+err
+        message: '你没有权限' + err
       })
     })
 })

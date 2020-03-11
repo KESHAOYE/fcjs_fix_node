@@ -13,7 +13,6 @@ const imgutil = new img()
 // 寻找是否有客服在线
 function chat() {
     var clients = []
-    var roomInfo = {}
     const ser = http.Server(app);
     const soc = socketIo(ser);
     console.log('socket服务启动');
@@ -22,16 +21,17 @@ function chat() {
         //监听用户名
         socket.on('storeClientInfo', (data) => {
             var clientInfo = new Object()
-            let sql = `select * from userinfo where user_id = ${data.userid}`
+            let sql = `select * from userinfo where user_id = '${data.userid}'`
             mysql(sql)
                 .then(a => {
-                    a = JSON.parse(JSON.stringify(data))
-                    a.path = a.path == null ? 'http://localhost:3000/userHead/default.png' : imgutil.imgtobase(`./public${a.path}`)
+                    a = JSON.parse(JSON.stringify(a))
+                    console.log(a[0].headimg)
+                    a[0].headimg = a[0].headimg == '' ? 'http://localhost:3000/userHead/default.png' : `http://localhost:3000${a[0].headimg}`
                     clientInfo.customId = data.customId;
                     clientInfo.type = data.type
                     clientInfo.clientId = socket.id;
                     clientInfo.userId = data.userid
-                    clientInfo.userHead = a.path
+                    clientInfo.userHead = a[0].headimg
                     clientInfo.isb = false
                     clients.push(clientInfo);
                     soc.emit('storeClientInfo', clients)
@@ -91,9 +91,15 @@ function chat() {
             })
             if (user != -1) {
                 console.log(`用户${clients[user].customId}断开连接${clients[user].type}`);
-                soc.emit('userDisconnect', {
+                if(clients[user].type == 'USER'){
+                  soc.emit('userDisconnect', {
                     info: clients[user]
-                })
+                  })
+                } else {
+                    soc.emit('adminDisconnect', {
+                        info: clients[user]
+                    })
+                }
                 clients.splice(user, 1)
             }
         });

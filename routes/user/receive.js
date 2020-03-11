@@ -70,33 +70,35 @@ app.use('/GETRECEIVE', (req, res, next) => {
         })
 })
 
-app.use('/DELETEUSERPAY',(req,res,next)=>{
-    let {paym_id} = req.body
+app.use('/DELETEUSERPAY', (req, res, next) => {
+    let {
+        paym_id
+    } = req.body
     let _t_ = req.headers.authorization
     let phone = req.headers.phone
     let t = tokens.checkToken(phone, _t_)
-    t.then(data=>{
-       let sql = `update user_pay u set u.delete = 1 where paym_id = ${paym_id}`
-       mysql(sql)
-        .then(data => {
-            res.json({
-                code: 200,
-                message: '删除成功'
-            })
+    t.then(data => {
+            let sql = `update user_pay u set u.delete = 1 where paym_id = '${paym_id}'`
+            mysql(sql)
+                .then(data => {
+                    res.json({
+                        code: 200,
+                        message: '删除成功'
+                    })
+                })
+                .catch(err => {
+                    res.json({
+                        code: 600,
+                        message: '删除失败' + err
+                    })
+                })
         })
         .catch(err => {
             res.json({
-                code: 600,
-                message: '删除失败' + err
+                code: 601,
+                message: '你没有权限' + err
             })
         })
-    })
-    .catch(err=>{
-        res.json({
-            code: 601,
-            message: '你没有权限' + err
-        })
-    })
 })
 
 app.use('/DELETERECEIVE', (req, res, next) => {
@@ -108,20 +110,20 @@ app.use('/DELETERECEIVE', (req, res, next) => {
     let phone = req.headers.phone
     let t = tokens.checkAdminToken(phone, _t_, roleid)
     t.then(data => {
-    let sql = `update receive set isshow = 1 where receive_id = '${receive_id}'`
-    mysql(sql)
-        .then(data => {
-            res.json({
-                code: 200,
-                message: '删除成功'
+        let sql = `update receive set isshow = 1 where receive_id = '${receive_id}'`
+        mysql(sql)
+            .then(data => {
+                res.json({
+                    code: 200,
+                    message: '删除成功'
+                })
             })
-        })
-        .catch(err => {
-            res.json({
-                code: 600,
-                message: '删除失败' + err
+            .catch(err => {
+                res.json({
+                    code: 600,
+                    message: '删除失败' + err
+                })
             })
-        })
     }).catch(err => {
         res.json({
             code: 601,
